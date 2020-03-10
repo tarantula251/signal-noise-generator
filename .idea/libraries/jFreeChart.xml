@@ -1,13 +1,10 @@
 <component name="libraryTable">
   <library name="jFreeChart">
     <CLASSES>
-      <root url="file://$PROJECT_DIR$/../../../../JavaFX/javafx-sdk-11.0.2/lib" />
+      <root url="file://$PROJECT_DIR$/../../../../JavaFX/jfreechart-1.0.19/lib" />
     </CLASSES>
     <JAVADOC />
-    <SOURCES>
-      <root url="file://$PROJECT_DIR$/../../../../JavaFX/javafx-sdk-11.0.2/lib" />
-    </SOURCES>
-    <jarDirectory url="file://$PROJECT_DIR$/../../../../JavaFX/javafx-sdk-11.0.2/lib" recursive="false" />
-    <jarDirectory url="file://$PROJECT_DIR$/../../../../JavaFX/javafx-sdk-11.0.2/lib" recursive="false" type="SOURCES" />
+    <SOURCES />
+    <jarDirectory url="file://$PROJECT_DIR$/../../../../JavaFX/jfreechart-1.0.19/lib" recursive="false" />
   </library>
 </component>
