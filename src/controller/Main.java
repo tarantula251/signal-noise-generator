@@ -14,6 +14,8 @@ public class Main extends Application {
         Scene scene = new Scene(root);
         stage.setScene(scene);
         stage.show();
+        stage.setMinHeight(stage.getHeight());
+        stage.setMinWidth(stage.getWidth());
 
 //        final PieChart chart = new PieChart(
 //                FXCollections.observableArrayList(

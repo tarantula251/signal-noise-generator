@@ -1,66 +1,101 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <?import javafx.geometry.*?>
+<?import javafx.scene.chart.*?>
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
 
-<GridPane fx:id="mainGrid" alignment="CENTER" stylesheets="/view/style.css" xmlns="http://javafx.com/javafx/10.0.2-internal" xmlns:fx="http://javafx.com/fxml/1" fx:controller="controller.ViewController">
+<GridPane xmlns="http://javafx.com/javafx/10.0.2-internal" xmlns:fx="http://javafx.com/fxml/1" fx:controller="controller.ViewController">
    <columnConstraints>
-      <ColumnConstraints />
-      <ColumnConstraints maxWidth="29.0" minWidth="22.0" prefWidth="22.0" />
-      <ColumnConstraints minWidth="-Infinity" prefWidth="350.0" />
+      <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" />
    </columnConstraints>
    <rowConstraints>
-      <RowConstraints minHeight="50.0" prefHeight="50.0" />
-      <RowConstraints maxHeight="0.0" minHeight="0.0" prefHeight="0.0" />
-      <RowConstraints minHeight="50.0" prefHeight="50.0" />
-      <RowConstraints minHeight="50.0" prefHeight="50.0" />
-      <RowConstraints minHeight="50.0" prefHeight="50.0" />
-      <RowConstraints minHeight="50.0" prefHeight="50.0" />
-      <RowConstraints minHeight="50.0" prefHeight="50.0" />
+      <RowConstraints minHeight="10.0" prefHeight="30.0" valignment="TOP" vgrow="NEVER" />
+      <RowConstraints minHeight="10.0" vgrow="SOMETIMES" />
    </rowConstraints>
    <children>
-      <Label fx:id="selectTypeLabel" text="Wybierz rodzaj sygnału:" GridPane.valignment="TOP" />
-      <ComboBox fx:id="signalTypeComboBox" prefWidth="200.0" promptText="-" GridPane.valignment="BOTTOM">
-         <GridPane.margin>
-            <Insets bottom="5.0" />
-         </GridPane.margin>
-      </ComboBox>
-      <TextField fx:id="durationInput" prefWidth="200.0" promptText="Wpisz czas trwania [s]" GridPane.rowIndex="2" GridPane.valignment="BOTTOM">
-         <GridPane.margin>
-            <Insets bottom="5.0" />
-         </GridPane.margin></TextField>
-      <TextField fx:id="startingTimeInput" promptText="Wpisz czas początkowy [s]" GridPane.rowIndex="3" GridPane.valignment="BOTTOM">
-         <GridPane.margin>
-            <Insets bottom="5.0" />
-         </GridPane.margin></TextField>
-      <TextField fx:id="amplitudeInput" promptText="Wpisz amplitudę" GridPane.rowIndex="4" GridPane.valignment="BOTTOM">
-         <GridPane.margin>
-            <Insets bottom="5.0" />
-         </GridPane.margin></TextField>
-      <TextField fx:id="frequencyInput" layoutX="10.0" layoutY="273.0" promptText="Wpisz częstotliwość [Hz]" GridPane.rowIndex="5" GridPane.valignment="BOTTOM">
-         <GridPane.margin>
-            <Insets bottom="5.0" />
-         </GridPane.margin></TextField>
-      <Separator orientation="VERTICAL" prefHeight="200.0" prefWidth="8.0" GridPane.columnIndex="1" GridPane.halignment="CENTER" GridPane.rowSpan="6" GridPane.valignment="CENTER">
-         <GridPane.margin>
-            <Insets left="10.0" />
-         </GridPane.margin></Separator>
-      <Button fx:id="importBtn" minWidth="-Infinity" mnemonicParsing="false" prefWidth="75.0" text="Importuj" GridPane.halignment="LEFT" GridPane.rowIndex="6">
-         <GridPane.margin>
-            <Insets left="10.0" right="20.0" />
-         </GridPane.margin></Button>
-      <Button fx:id="exportBtn" minWidth="-Infinity" mnemonicParsing="false" prefWidth="75.0" text="Eksportuj" GridPane.halignment="RIGHT" GridPane.rowIndex="6">
-         <GridPane.margin>
-            <Insets left="10.0" right="20.0" />
-         </GridPane.margin>
-      </Button>
-      <Label text="Czas trwania:" GridPane.rowIndex="2" GridPane.valignment="TOP" />
-      <Label text="Czas początkowy:" GridPane.rowIndex="3" GridPane.valignment="TOP" />
-      <Label text="Amplituda:" GridPane.rowIndex="4" GridPane.valignment="TOP" />
-      <Label text="Częstotliwość:" GridPane.rowIndex="5" GridPane.valignment="TOP" />
+      <MenuBar>
+        <menus>
+          <Menu mnemonicParsing="false" text="Plik">
+            <items>
+                  <MenuItem mnemonicParsing="false" text="Exportuj..." />
+                  <MenuItem mnemonicParsing="false" text="Importuj..." />
+                  <SeparatorMenuItem mnemonicParsing="false" />
+              <MenuItem mnemonicParsing="false" text="Zamknij" />
+            </items>
+          </Menu>
+        </menus>
+      </MenuBar>
+      <GridPane fx:id="mainGrid" stylesheets="/view/style.css" GridPane.rowIndex="1">
+         <columnConstraints>
+            <ColumnConstraints />
+            <ColumnConstraints maxWidth="29.0" minWidth="22.0" prefWidth="22.0" />
+            <ColumnConstraints halignment="LEFT" hgrow="ALWAYS" minWidth="-Infinity" prefWidth="350.0" />
+         </columnConstraints>
+         <rowConstraints>
+            <RowConstraints />
+            <RowConstraints />
+            <RowConstraints minHeight="50.0" prefHeight="50.0" />
+            <RowConstraints maxHeight="0.0" minHeight="0.0" prefHeight="0.0" />
+            <RowConstraints minHeight="50.0" prefHeight="50.0" />
+            <RowConstraints minHeight="50.0" prefHeight="50.0" />
+            <RowConstraints minHeight="50.0" prefHeight="50.0" />
+            <RowConstraints minHeight="50.0" prefHeight="50.0" />
+            <RowConstraints minHeight="50.0" prefHeight="50.0" vgrow="ALWAYS" />
+         </rowConstraints>
+         <children>
+            <Label fx:id="selectTypeLabel" text="Wybierz rodzaj sygnału:" GridPane.rowIndex="2" GridPane.valignment="TOP" />
+            <ComboBox fx:id="signalTypeComboBox" prefWidth="200.0" promptText="-" GridPane.rowIndex="2" GridPane.valignment="BOTTOM">
+               <GridPane.margin>
+                  <Insets bottom="5.0" />
+               </GridPane.margin>
+            </ComboBox>
+            <TextField fx:id="durationInput" prefWidth="200.0" promptText="Wpisz czas trwania [s]" GridPane.rowIndex="4" GridPane.valignment="BOTTOM">
+               <GridPane.margin>
+                  <Insets bottom="5.0" />
+               </GridPane.margin>
+            </TextField>
+            <TextField fx:id="startingTimeInput" promptText="Wpisz czas początkowy [s]" GridPane.rowIndex="5" GridPane.valignment="BOTTOM">
+               <GridPane.margin>
+                  <Insets bottom="5.0" />
+               </GridPane.margin>
+            </TextField>
+            <TextField fx:id="amplitudeInput" promptText="Wpisz amplitudę" GridPane.rowIndex="6" GridPane.valignment="BOTTOM">
+               <GridPane.margin>
+                  <Insets bottom="5.0" />
+               </GridPane.margin>
+            </TextField>
+            <TextField fx:id="frequencyInput" layoutX="10.0" layoutY="273.0" promptText="Wpisz częstotliwość [Hz]" GridPane.rowIndex="7" GridPane.valignment="BOTTOM">
+               <GridPane.margin>
+                  <Insets bottom="5.0" />
+               </GridPane.margin>
+            </TextField>
+            <Separator maxHeight="1.7976931348623157E308" orientation="VERTICAL" prefHeight="200.0" prefWidth="8.0" GridPane.columnIndex="1" GridPane.halignment="CENTER" GridPane.rowIndex="2" GridPane.rowSpan="7" GridPane.valignment="TOP">
+               <GridPane.margin>
+                  <Insets left="10.0" />
+               </GridPane.margin>
+            </Separator>
+            <Button fx:id="importBtn" minWidth="-Infinity" mnemonicParsing="false" prefWidth="75.0" text="Generuj" GridPane.halignment="CENTER" GridPane.rowIndex="8" GridPane.valignment="TOP">
+               <GridPane.margin>
+                  <Insets left="10.0" right="20.0" top="15.0" />
+               </GridPane.margin>
+            </Button>
+            <Label text="Czas trwania:" GridPane.rowIndex="4" GridPane.valignment="TOP" />
+            <Label text="Czas początkowy:" GridPane.rowIndex="5" GridPane.valignment="TOP" />
+            <Label text="Amplituda:" GridPane.rowIndex="6" GridPane.valignment="TOP" />
+            <Label text="Częstotliwość:" GridPane.rowIndex="7" GridPane.valignment="TOP" />
+            <LineChart GridPane.columnIndex="2" GridPane.rowIndex="2" GridPane.rowSpan="7">
+              <xAxis>
+                <CategoryAxis side="BOTTOM" />
+              </xAxis>
+              <yAxis>
+                <NumberAxis side="LEFT" />
+              </yAxis>
+            </LineChart>
+         </children>
+         <padding>
+            <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
+         </padding>
+      </GridPane>
    </children>
-   <padding>
-      <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
-   </padding>
 </GridPane>
