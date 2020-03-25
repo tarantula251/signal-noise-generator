@@ -1,0 +1,125 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.*?>
+<?import javafx.scene.*?>
+<?import javafx.scene.chart.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<GridPane fx:id="mainGrid" alignment="CENTER" prefHeight="340.0" prefWidth="865.0" stylesheets="/view/resources/style.css" xmlns="http://javafx.com/javafx/10.0.2-internal" xmlns:fx="http://javafx.com/fxml/1" fx:controller="controller.ViewController">
+   <columnConstraints>
+      <ColumnConstraints maxWidth="-Infinity" minWidth="-Infinity" prefWidth="150.0" />
+      <ColumnConstraints maxWidth="30.0" minWidth="15.0" prefWidth="15.0" />
+      <ColumnConstraints minWidth="-Infinity" prefWidth="350.0" />
+      <ColumnConstraints minWidth="-Infinity" prefWidth="350.0" />
+   </columnConstraints>
+   <rowConstraints>
+      <RowConstraints />
+      <RowConstraints minHeight="10.0" prefHeight="10.0" />
+      <RowConstraints minHeight="50.0" prefHeight="50.0" />
+      <RowConstraints minHeight="50.0" prefHeight="50.0" />
+      <RowConstraints minHeight="50.0" prefHeight="50.0" />
+      <RowConstraints minHeight="50.0" prefHeight="50.0" />
+      <RowConstraints minHeight="50.0" prefHeight="50.0" />
+      <RowConstraints minHeight="50.0" prefHeight="50.0" />
+      <RowConstraints />
+      <RowConstraints maxHeight="0.0" minHeight="0.0" prefHeight="0.0" />
+   </rowConstraints>
+   <children>
+      <!-- top menu -->
+      <MenuBar GridPane.columnSpan="4">
+         <menus>
+            <Menu mnemonicParsing="false" text="Plik">
+               <items>
+                  <MenuItem mnemonicParsing="false" text="Eksportuj..." />
+                  <MenuItem mnemonicParsing="false" text="Importuj..." />
+                  <SeparatorMenuItem mnemonicParsing="false" />
+                  <MenuItem mnemonicParsing="false" text="Zamknij" />
+               </items>
+            </Menu>
+         </menus>
+         <GridPane.margin>
+            <Insets />
+         </GridPane.margin>
+      </MenuBar>
+      <!-- main menu -->
+      <Label fx:id="selectTypeLabel" text="Wybierz rodzaj sygnału:" GridPane.rowIndex="2" GridPane.valignment="TOP">
+         <GridPane.margin>
+            <Insets left="10.0" />
+         </GridPane.margin></Label>
+      <ComboBox fx:id="signalTypeComboBox" prefWidth="200.0" GridPane.rowIndex="2" GridPane.valignment="BOTTOM">
+         <GridPane.margin>
+            <Insets bottom="5.0" left="10.0" />
+         </GridPane.margin>
+         <padding>
+            <Insets left="10.0" />
+         </padding>
+      </ComboBox>
+      <TextField fx:id="durationInput" prefWidth="200.0" promptText="Wpisz czas trwania [s]" GridPane.rowIndex="3" GridPane.valignment="BOTTOM">
+         <GridPane.margin>
+            <Insets bottom="5.0" left="10.0" />
+         </GridPane.margin></TextField>
+      <TextField fx:id="startingTimeInput" promptText="Wpisz czas początkowy [s]" GridPane.rowIndex="4" GridPane.valignment="BOTTOM">
+         <GridPane.margin>
+            <Insets bottom="5.0" left="10.0" />
+         </GridPane.margin></TextField>
+      <TextField fx:id="amplitudeInput" promptText="Wpisz amplitudę" GridPane.rowIndex="5" GridPane.valignment="BOTTOM">
+         <GridPane.margin>
+            <Insets bottom="5.0" left="10.0" />
+         </GridPane.margin></TextField>
+      <TextField fx:id="frequencyInput" layoutX="10.0" layoutY="273.0" promptText="Wpisz częstotliwość [Hz]" GridPane.rowIndex="6" GridPane.valignment="BOTTOM">
+         <GridPane.margin>
+            <Insets bottom="5.0" left="10.0" />
+         </GridPane.margin></TextField>
+      <Separator halignment="RIGHT" orientation="VERTICAL" prefHeight="200.0" prefWidth="1.0" GridPane.columnIndex="1" GridPane.halignment="RIGHT" GridPane.rowIndex="3" GridPane.rowSpan="7" GridPane.valignment="CENTER">
+         <GridPane.margin>
+            <Insets left="10.0" />
+         </GridPane.margin>
+      </Separator>
+      <Label text="Czas trwania:" GridPane.rowIndex="3" GridPane.valignment="TOP">
+         <GridPane.margin>
+            <Insets left="10.0" />
+         </GridPane.margin></Label>
+      <Label text="Czas początkowy:" GridPane.rowIndex="4" GridPane.valignment="TOP">
+         <GridPane.margin>
+            <Insets left="10.0" />
+         </GridPane.margin></Label>
+      <Label text="Amplituda:" GridPane.rowIndex="5" GridPane.valignment="TOP">
+         <GridPane.margin>
+            <Insets left="10.0" />
+         </GridPane.margin></Label>
+      <Label text="Częstotliwość:" GridPane.rowIndex="6" GridPane.valignment="TOP">
+         <GridPane.margin>
+            <Insets left="10.0" />
+         </GridPane.margin></Label>
+      <Button fx:id="generateBtn" minWidth="-Infinity" mnemonicParsing="false" onAction="#generateChart" prefWidth="75.0" text="Generuj" GridPane.halignment="CENTER" GridPane.rowIndex="7" />
+      <Separator orientation="VERTICAL" prefHeight="200.0" GridPane.columnIndex="1" GridPane.halignment="RIGHT" GridPane.rowIndex="1" GridPane.rowSpan="7" />
+      <!-- line chart -->
+      <LineChart fx:id="lineChart" createSymbols="false" legendVisible="false" title="Wykres liniowy" GridPane.columnIndex="2" GridPane.halignment="CENTER" GridPane.rowIndex="2" GridPane.rowSpan="8" GridPane.valignment="CENTER">
+         <xAxis>
+            <NumberAxis autoRanging="false" label="t" lowerBound="-10" side="BOTTOM" tickUnit="1" upperBound="10" />
+         </xAxis>
+         <yAxis>
+            <NumberAxis autoRanging="false" label="x(t)" lowerBound="-10" side="LEFT" tickUnit="1" upperBound="10" />
+         </yAxis>
+         <cursor>
+            <Cursor fx:constant="CROSSHAIR" />
+         </cursor>
+         <GridPane.margin>
+            <Insets right="10.0" />
+         </GridPane.margin>
+      </LineChart>
+      <!-- bar chart -->
+      <BarChart fx:id="barChart" title="Histogram" GridPane.columnIndex="3" GridPane.halignment="CENTER" GridPane.rowIndex="2" GridPane.rowSpan="8" GridPane.valignment="CENTER">
+         <xAxis>
+            <CategoryAxis label="t" side="BOTTOM" />
+         </xAxis>
+         <yAxis>
+            <NumberAxis label="x(t)" side="LEFT" />
+         </yAxis>
+         <GridPane.margin>
+            <Insets right="10.0" />
+         </GridPane.margin>
+      </BarChart>
+   </children>
+</GridPane>
