@@ -72,7 +72,7 @@
                               <TextField fx:id="startingTimeInput" promptText="Wpisz czas początkowy [s]" GridPane.rowIndex="5" />
                               <TextField fx:id="amplitudeInput" promptText="Wpisz amplitudę" GridPane.rowIndex="7" />
                               <TextField fx:id="frequencyInput" promptText="Wpisz częstotliwość [Hz]" GridPane.rowIndex="9" />
-                              <Button fx:id="importBtn" minWidth="-Infinity" mnemonicParsing="false" prefWidth="75.0" text="Generuj" GridPane.halignment="CENTER" GridPane.rowIndex="10">
+                              <Button fx:id="generateButton" minWidth="-Infinity" mnemonicParsing="false" prefWidth="75.0" text="Generuj" GridPane.halignment="CENTER" GridPane.rowIndex="10">
                                  <GridPane.margin>
                                     <Insets top="15.0" />
                                  </GridPane.margin>
@@ -93,9 +93,9 @@
                   <Insets left="10.0" />
                </GridPane.margin>
             </Separator>
-            <LineChart GridPane.columnIndex="2" GridPane.rowIndex="2" GridPane.rowSpan="7">
+            <LineChart fx:id="lineChart" legendSide="RIGHT" GridPane.columnIndex="2" GridPane.rowIndex="2" GridPane.rowSpan="7">
               <xAxis>
-                <CategoryAxis side="BOTTOM" />
+                <NumberAxis side="BOTTOM" />
               </xAxis>
               <yAxis>
                 <NumberAxis side="LEFT" />
