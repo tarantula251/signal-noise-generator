@@ -16,15 +16,6 @@ public class Main extends Application {
         stage.show();
         stage.setMinHeight(stage.getHeight());
         stage.setMinWidth(stage.getWidth());
-
-//        final PieChart chart = new PieChart(
-//                FXCollections.observableArrayList(
-//                        new PieChart.Data("China",         1344.0),
-//                        new PieChart.Data("India",         1241.0),
-//                        new PieChart.Data("United States",  310.5)
-//                )
-//        );
-//        chart.setTitle("Population 2011");
     }
 
     public static void main(String[] args) {
