@@ -10,11 +10,12 @@
       <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" />
    </columnConstraints>
    <rowConstraints>
+      <RowConstraints />
       <RowConstraints minHeight="10.0" prefHeight="30.0" valignment="TOP" vgrow="NEVER" />
       <RowConstraints minHeight="10.0" vgrow="SOMETIMES" />
    </rowConstraints>
    <children>
-      <MenuBar>
+      <MenuBar GridPane.rowIndex="1">
         <menus>
           <Menu mnemonicParsing="false" text="Plik">
             <items>
@@ -26,11 +27,12 @@
           </Menu>
         </menus>
       </MenuBar>
-      <GridPane fx:id="mainGrid" stylesheets="/view/style.css" GridPane.rowIndex="1">
+      <GridPane fx:id="mainGrid" stylesheets="/view/style.css" GridPane.rowIndex="2">
          <columnConstraints>
             <ColumnConstraints />
             <ColumnConstraints maxWidth="29.0" minWidth="22.0" prefWidth="22.0" />
             <ColumnConstraints halignment="LEFT" hgrow="ALWAYS" minWidth="-Infinity" prefWidth="350.0" />
+            <ColumnConstraints halignment="LEFT" hgrow="ALWAYS" minWidth="10.0" prefWidth="350.0" />
          </columnConstraints>
          <rowConstraints>
             <RowConstraints />
@@ -93,7 +95,15 @@
                   <Insets left="10.0" />
                </GridPane.margin>
             </Separator>
-            <LineChart fx:id="lineChart" legendSide="RIGHT" GridPane.columnIndex="2" GridPane.rowIndex="2" GridPane.rowSpan="7">
+            <BarChart fx:id="barChart" GridPane.columnIndex="3" GridPane.rowIndex="2" GridPane.rowSpan="2147483647">
+              <xAxis>
+                <CategoryAxis side="BOTTOM" />
+              </xAxis>
+              <yAxis>
+                <NumberAxis side="LEFT" />
+              </yAxis>
+            </BarChart>
+            <LineChart fx:id="lineChart" GridPane.columnIndex="2" GridPane.rowIndex="2" GridPane.rowSpan="2147483647">
               <xAxis>
                 <NumberAxis side="BOTTOM" />
               </xAxis>

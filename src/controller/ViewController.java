@@ -1,8 +1,10 @@
 package controller;
 
+import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
+import javafx.scene.chart.BarChart;
 import javafx.scene.chart.LineChart;
 import javafx.scene.chart.XYChart;
 import javafx.scene.control.Button;
@@ -16,7 +18,10 @@ import model.signal.generator.SignalGeneratorFactory;
 
 import java.net.URL;
 import java.time.LocalDateTime;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.ResourceBundle;
+import java.util.TreeMap;
 
 public class ViewController implements Initializable {
     // menu elements
@@ -26,14 +31,19 @@ public class ViewController implements Initializable {
     @FXML private TextField amplitudeInput;
     @FXML private TextField frequencyInput;
     @FXML private LineChart<Number, Number> lineChart;
+    @FXML private BarChart<Number, Number> barChart;
     @FXML private Button generateButton;
 
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
 
-        //Set axis labels
-        lineChart.getXAxis().setLabel("Time");
-        lineChart.getYAxis().setLabel("Value");
+        lineChart.setTitle("Krzywa sygnału");
+        lineChart.getXAxis().setLabel("Czas");
+        lineChart.getYAxis().setLabel("Wartość");
+
+        barChart.setTitle("Rozkład wartości próbek");
+        barChart.getXAxis().setLabel("Wartość");
+        barChart.getYAxis().setLabel("Ilość próbek");
 
         // populate data in combobox
         signalTypeComboBox.getItems().addAll(
@@ -51,32 +61,62 @@ public class ViewController implements Initializable {
         );
         signalTypeComboBox.setVisibleRowCount(11);
 
-        EventHandler<MouseEvent> mouseEventEventHandler = new EventHandler<MouseEvent>() {
+        EventHandler<ActionEvent> actionEventEventHandler = new EventHandler<ActionEvent>() {
             @Override
-            public void handle(MouseEvent mouseEvent) {
+            public void handle(ActionEvent mouseEvent) {
                 SignalGenerator signalGenerator = SignalGeneratorFactory.getSignalGenerator(SignalGeneratorFactory.getGeneratorNameFromId(signalTypeComboBox.getSelectionModel().getSelectedIndex()));
                 if(signalGenerator == null) return;
                 Signal signal = signalGenerator.generate(Double.parseDouble(durationInput.getText()),
                         Double.parseDouble(startingTimeInput.getText()),
                         Double.parseDouble(amplitudeInput.getText()),
                         Double.parseDouble(frequencyInput.getText()));
-                if(signal == null) return;
-
-                lineChart.getData().clear();
-
-                lineChart.getData().add(new XYChart.Series<Number, Number>());
-                XYChart.Series series = lineChart.getData().get(0);
-                series.setName("Signal " + LocalDateTime.now().toString());
-                for(Sample sample : signal.getSamples())
-                {
-                    series.getData().add(new XYChart.Data<Number, Number>(sample.time, sample.value));
-                }
+                signal.setName("Signal " + LocalDateTime.now().toString());
+                drawSignalCurve(signal);
+                drawHistogram(signal);
             }
         };
-
-        generateButton.setOnMouseClicked(mouseEventEventHandler);
-
+        generateButton.setOnAction(actionEventEventHandler);
     }
 
+    private void drawSignalCurve(Signal signal)
+    {
+        if(signal == null) return;
+        lineChart.getData().clear();
+        lineChart.getData().add(new XYChart.Series<Number, Number>());
+        XYChart.Series series = lineChart.getData().get(0);
+        series.setName(signal.getName());
+        for(Sample sample : signal.getSamples())
+        {
+            series.getData().add(new XYChart.Data<Number, Number>(sample.time, sample.value));
+        }
+    }
 
+    private void drawHistogram(Signal signal)
+    {
+        if(signal == null) return;
+        int  interval = 10; //Must be chosen by user
+        int lowestPossibleValue = (int)Math.floor(-signal.getAmplitude());
+        TreeMap<Integer, Integer> histogramIntervals = new TreeMap<>();
+        for(Sample sample : signal.getSamples())
+        {
+            int sampleInterval = lowestPossibleValue;
+            while(sampleInterval < sample.value)
+            {
+                sampleInterval += interval;
+            }
+            Integer sampleCount = histogramIntervals.get(sampleInterval);
+            if(sampleCount == null) histogramIntervals.put(sampleInterval, 1);
+            else histogramIntervals.put(sampleInterval, sampleCount + 1);
+        }
+        if(histogramIntervals.isEmpty()) return;
+
+        barChart.getData().clear();
+        barChart.getData().add(new BarChart.Series<>());
+        BarChart.Series series = barChart.getData().get(0);
+        series.setName(signal.getName());
+        for(Map.Entry<Integer, Integer> histogramInterval : histogramIntervals.entrySet())
+        {
+            series.getData().add(new BarChart.Data<String, Number>(Integer.toString(histogramInterval.getKey() - interval) + " - " + histogramInterval.getKey().toString(), histogramInterval.getValue()));
+        }
+    }
 }
