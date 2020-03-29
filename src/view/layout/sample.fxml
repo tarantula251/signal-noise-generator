@@ -87,7 +87,7 @@
                         </GridPane>
                      </content>
                   </Tab>
-                  <Tab text="Sygnały" />
+                  <Tab text="Działania" />
                </tabs>
             </TabPane>
             <Separator maxHeight="1.7976931348623157E308" orientation="VERTICAL" prefHeight="200.0" prefWidth="8.0" GridPane.columnIndex="1" GridPane.halignment="CENTER" GridPane.rowIndex="2" GridPane.rowSpan="7" GridPane.valignment="TOP">
@@ -103,12 +103,12 @@
                 <NumberAxis side="LEFT" />
               </yAxis>
             </BarChart>
-            <LineChart fx:id="lineChart" GridPane.columnIndex="2" GridPane.rowIndex="2" GridPane.rowSpan="2147483647">
+            <LineChart fx:id="lineChart" GridPane.columnIndex="2" GridPane.rowIndex="2" GridPane.rowSpan="7">
               <xAxis>
-                <NumberAxis side="BOTTOM" />
+                 <NumberAxis side="BOTTOM" lowerBound="-5" tickUnit="1" upperBound="5" />
               </xAxis>
               <yAxis>
-                <NumberAxis side="LEFT" />
+                 <NumberAxis side="LEFT" lowerBound="-5" tickUnit="1" upperBound="5"/>
               </yAxis>
             </LineChart>
          </children>

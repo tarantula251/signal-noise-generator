@@ -1,35 +1,32 @@
 package model.signal.generator;
 
-import java.util.ArrayList;
-
 public class SignalGeneratorFactory {
-
-    static private ArrayList<String> generatorsIds = null;
+    // signal types
+    private static final String SIGNAL_TYPE_S1_VALUE = "S1: Szum o rozkładzie jednostajnym";
+    private static final String SIGNAL_TYPE_S2_VALUE = "S2: Szum gaussowski";
+    private static final String SIGNAL_TYPE_S3_VALUE = "S3: Sygnał sinusoidalny";
+    private static final String SIGNAL_TYPE_S4_VALUE = "S4: Sygnał sinusoidalny wyprostowany jednopołówkowo";
+    private static final String SIGNAL_TYPE_S5_VALUE = "S5: Sygnał sinusoidalny wyprostowany dwupołówkowo";
+    private static final String SIGNAL_TYPE_S6_VALUE = "S6: Sygnał prostokątny";
+    private static final String SIGNAL_TYPE_S7_VALUE = "S7: Sygnał prostokątny symetryczny";
+    private static final String SIGNAL_TYPE_S8_VALUE = "S8: Sygnał trójkątny";
+    private static final String SIGNAL_TYPE_S9_VALUE = "S9: Skok jednostkowy";
+    private static final String SIGNAL_TYPE_S10_VALUE = "S10: Impuls jednostkowy";
+    private static final String SIGNAL_TYPE_S11_VALUE = "S11: Szum impulsowy";
 
     static public SignalGenerator getSignalGenerator(String type)
     {
         if(type == null) return null;
-        if(type.equals("UniformDistributionSignalGenerator")) return new UniformDistributionSignalGenerator();
+        switch (type) {
+            case SIGNAL_TYPE_S1_VALUE: {
+                return new UniformDistributionSignalGenerator();
+            }
+            //TODO Add signal s2
+            case SIGNAL_TYPE_S3_VALUE: {
+                return new SinusoidalSignalGenerator();
+            }
+        }
         return null;
     }
-
-    static public String getGeneratorNameFromId(Integer id)
-    {
-        if(generatorsIds == null)
-        {
-            generatorsIds = new ArrayList<>();
-            //Add new SignalGenerator classes names below
-            generatorsIds.add("UniformDistributionSignalGenerator");
-        }
-        try
-        {
-            return generatorsIds.get(id);
-        }
-        catch (IndexOutOfBoundsException ex)
-        {
-            return null;
-        }
-    }
-
 
 }

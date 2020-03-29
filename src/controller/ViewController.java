@@ -1,5 +1,8 @@
 package controller;
 
+import javafx.beans.binding.BooleanBinding;
+import javafx.beans.value.ChangeListener;
+import javafx.beans.value.ObservableValue;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.fxml.FXML;
@@ -17,6 +20,7 @@ import model.signal.generator.SignalGeneratorFactory;
 
 import java.net.URL;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.Map;
 import java.util.ResourceBundle;
 import java.util.TreeMap;
@@ -57,12 +61,15 @@ public class ViewController implements Initializable {
                 "S10: Impuls jednostkowy",
                 "S11: Szum impulsowy"
         );
+        signalTypeComboBox.getSelectionModel().selectFirst();
         signalTypeComboBox.setVisibleRowCount(11);
+        setTextFieldsValidation();
+        enableDisableGenerateBtn();
 
         EventHandler<ActionEvent> actionEventEventHandler = new EventHandler<ActionEvent>() {
             @Override
             public void handle(ActionEvent mouseEvent) {
-                SignalGenerator signalGenerator = SignalGeneratorFactory.getSignalGenerator(SignalGeneratorFactory.getGeneratorNameFromId(signalTypeComboBox.getSelectionModel().getSelectedIndex()));
+                SignalGenerator signalGenerator = SignalGeneratorFactory.getSignalGenerator((String) signalTypeComboBox.getValue());
                 if(signalGenerator == null) return;
                 Signal signal = signalGenerator.generate(Double.parseDouble(durationInput.getText()),
                         Double.parseDouble(startingTimeInput.getText()),
@@ -116,5 +123,43 @@ public class ViewController implements Initializable {
         {
             series.getData().add(new BarChart.Data<String, Number>(Integer.toString(histogramInterval.getKey() - interval) + " - " + histogramInterval.getKey().toString(), histogramInterval.getValue()));
         }
+    }
+
+    private void setTextFieldsValidation() {
+        ArrayList<TextField> textFieldList = new ArrayList<>();
+        textFieldList.add(durationInput);
+        textFieldList.add(startingTimeInput);
+        textFieldList.add(amplitudeInput);
+        textFieldList.add(frequencyInput);
+        textFieldList.add(durationInput);
+        for (TextField field : textFieldList) {
+            field.textProperty().addListener(new ChangeListener<String>() {
+                @Override
+                public void changed(ObservableValue<? extends String> observableValue, String oldValue, String newValue) {
+                    if (!newValue.matches("[-]?\\d*(\\.\\d*)?")) {
+                        field.setText(oldValue);
+                    }
+                }
+            });
+        }
+    }
+
+    private void enableDisableGenerateBtn() {
+        BooleanBinding binding = new BooleanBinding() {
+            {
+                super.bind(durationInput.textProperty(),
+                        startingTimeInput.textProperty(),
+                        amplitudeInput.textProperty(),
+                        frequencyInput.textProperty());
+            }
+            @Override
+            protected boolean computeValue() {
+                return (durationInput.getText().isEmpty()
+                        || startingTimeInput.getText().isEmpty()
+                        || amplitudeInput.getText().isEmpty()
+                        || frequencyInput.getText().isEmpty());
+            }
+        };
+        generateButton.disableProperty().bind(binding);
     }
 }
