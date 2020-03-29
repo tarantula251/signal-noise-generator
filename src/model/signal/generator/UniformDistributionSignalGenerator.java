@@ -4,6 +4,7 @@ import model.signal.Sample;
 import model.signal.Signal;
 
 import java.util.ArrayList;
+import java.util.Random;
 
 public class UniformDistributionSignalGenerator implements SignalGenerator {
     @Override
@@ -15,10 +16,12 @@ public class UniformDistributionSignalGenerator implements SignalGenerator {
         double min = -amplitude;
         double max = amplitude;
 
+        Random random = new Random();
+
         for(int i = 0; i < samplesCount; ++i)
         {
-            samples.add(new Sample(beginTime + (i * samplesDistance), Math.random() * ((max - min) + 1) + min));
+            samples.add(new Sample(beginTime + (i * samplesDistance), random.nextDouble() * ((max - min) + 1) + min));
         }
-        return new Signal(samples);
+        return new Signal(samples, duration, amplitude, frequency);
     }
 }
