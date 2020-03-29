@@ -12,6 +12,7 @@ import javafx.scene.chart.LineChart;
 import javafx.scene.chart.XYChart;
 import javafx.scene.control.Button;
 import javafx.scene.control.ComboBox;
+import javafx.scene.control.Slider;
 import javafx.scene.control.TextField;
 import model.signal.Sample;
 import model.signal.Signal;
@@ -35,6 +36,7 @@ public class ViewController implements Initializable {
     @FXML private LineChart<Number, Number> lineChart;
     @FXML private BarChart<Number, Number> barChart;
     @FXML private Button generateButton;
+    @FXML private Slider intervalSlider;
 
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
@@ -88,6 +90,7 @@ public class ViewController implements Initializable {
         if(signal == null) return;
         lineChart.getData().clear();
         lineChart.getData().add(new XYChart.Series<Number, Number>());
+        lineChart.setCreateSymbols(false);
         XYChart.Series series = lineChart.getData().get(0);
         series.setName(signal.getName());
         for(Sample sample : signal.getSamples())
@@ -99,7 +102,7 @@ public class ViewController implements Initializable {
     private void drawHistogram(Signal signal)
     {
         if(signal == null) return;
-        int  interval = 10; //Must be chosen by user
+        int interval = (int) intervalSlider.getValue();
         int lowestPossibleValue = (int)Math.floor(-signal.getAmplitude());
         TreeMap<Integer, Integer> histogramIntervals = new TreeMap<>();
         for(Sample sample : signal.getSamples())
@@ -121,7 +124,7 @@ public class ViewController implements Initializable {
         series.setName(signal.getName());
         for(Map.Entry<Integer, Integer> histogramInterval : histogramIntervals.entrySet())
         {
-            series.getData().add(new BarChart.Data<String, Number>(Integer.toString(histogramInterval.getKey() - interval) + " - " + histogramInterval.getKey().toString(), histogramInterval.getValue()));
+            series.getData().add(new BarChart.Data<String, Number>("< " + Integer.toString(histogramInterval.getKey() - interval) + " , " + histogramInterval.getKey().toString() + " >", histogramInterval.getValue()));
         }
     }
 
