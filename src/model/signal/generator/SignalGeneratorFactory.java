@@ -25,6 +25,9 @@ public class SignalGeneratorFactory {
             case SIGNAL_TYPE_S3_VALUE: {
                 return new SinusoidalSignalGenerator();
             }
+            case SIGNAL_TYPE_S4_VALUE: {
+                return new SinusoidalHalfStraightGenerator();
+            }
         }
         return null;
     }
