@@ -9,12 +9,21 @@ public class Signal {
     private double duration;
     private double amplitude;
     private double frequency;
+    private double fillFactor;
 
     public Signal(ArrayList<Sample> samples, double duration, double amplitude, double frequency) {
         this.samples = samples;
         this.duration = duration;
         this.amplitude = amplitude;
         this.frequency = frequency;
+    }
+
+    public Signal(ArrayList<Sample> samples, double duration, double amplitude, double frequency, double fillFactor) {
+        this.samples = samples;
+        this.duration = duration;
+        this.amplitude = amplitude;
+        this.frequency = frequency;
+        this.fillFactor = fillFactor;
     }
 
     public String getName() {
@@ -39,5 +48,9 @@ public class Signal {
 
     public double getFrequency() {
         return frequency;
+    }
+
+    public double getFillFactor() {
+        return fillFactor;
     }
 }

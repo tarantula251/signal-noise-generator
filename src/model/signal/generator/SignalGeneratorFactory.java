@@ -31,6 +31,9 @@ public class SignalGeneratorFactory {
             case SIGNAL_TYPE_S5_VALUE: {
                 return new SinusoidalFullStraightGenerator();
             }
+            case SIGNAL_TYPE_S6_VALUE: {
+                return new RectangularSignalGenerator();
+            }
         }
         return null;
     }

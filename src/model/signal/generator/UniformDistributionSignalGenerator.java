@@ -24,4 +24,9 @@ public class UniformDistributionSignalGenerator implements SignalGenerator {
         }
         return new Signal(samples, duration, amplitude, frequency);
     }
+
+    @Override
+    public Signal generateWithFillFactor(Double duration, Double beginTime, Double amplitude, Double frequency, Double fillFactor) {
+        return null;
+    }
 }

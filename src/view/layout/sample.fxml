@@ -68,6 +68,8 @@
                               <RowConstraints minHeight="10.0" />
                               <RowConstraints minHeight="10.0" />
                               <RowConstraints minHeight="10.0" />
+                              <RowConstraints minHeight="10.0" />
+                              <RowConstraints minHeight="10.0" />
                               <RowConstraints minHeight="10.0" valignment="TOP" vgrow="ALWAYS" />
                            </rowConstraints>
                            <children>
@@ -77,9 +79,10 @@
                               <TextField fx:id="startingTimeInput" promptText="Wpisz czas początkowy [s]" GridPane.rowIndex="5" />
                               <TextField fx:id="amplitudeInput" promptText="Wpisz amplitudę" GridPane.rowIndex="7" />
                               <TextField fx:id="frequencyInput" promptText="Wpisz częstotliwość [Hz]" GridPane.rowIndex="9" />
-                              <Button fx:id="generateButton" minWidth="-Infinity" mnemonicParsing="false" prefWidth="75.0" text="Generuj" GridPane.halignment="CENTER" GridPane.rowIndex="12">
+                              <TextField fx:id="fillFactorInput" promptText="Wpisz współczynnik k" GridPane.rowIndex="13" disable="true" />
+                              <Button fx:id="generateButton" minWidth="-Infinity" mnemonicParsing="false" prefWidth="75.0" text="Generuj" GridPane.halignment="CENTER" GridPane.rowIndex="14">
                                  <GridPane.margin>
-                                    <Insets bottom="5.0" top="15.0" />
+                                    <Insets bottom="5.0" top="10.0" />
                                  </GridPane.margin>
                               </Button>
                               <Label text="Czas trwania:" GridPane.rowIndex="2" />
@@ -88,6 +91,7 @@
                               <Label text="Częstotliwość:" GridPane.rowIndex="8" />
                               <Label text="Przedział histogramu:" GridPane.rowIndex="10" />
                               <Slider fx:id="intervalSlider" blockIncrement="5" cache="true" majorTickUnit="5" max="20" min="5" minorTickCount="0" showTickLabels="true" showTickMarks="true" snapToTicks="true" value="5" GridPane.rowIndex="11" />
+                              <Label text="Współczynnik wypełnienia:" GridPane.rowIndex="12" />
                            </children>
                         </GridPane>
                      </content>

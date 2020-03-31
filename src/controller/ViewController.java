@@ -21,10 +21,7 @@ import model.signal.generator.SignalGeneratorFactory;
 
 import java.net.URL;
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.Map;
-import java.util.ResourceBundle;
-import java.util.TreeMap;
+import java.util.*;
 
 public class ViewController implements Initializable {
     // menu elements
@@ -33,6 +30,7 @@ public class ViewController implements Initializable {
     @FXML private TextField startingTimeInput;
     @FXML private TextField amplitudeInput;
     @FXML private TextField frequencyInput;
+    @FXML private TextField fillFactorInput;
     @FXML private LineChart<Number, Number> lineChart;
     @FXML private BarChart<Number, Number> barChart;
     @FXML private Button generateButton;
@@ -67,16 +65,26 @@ public class ViewController implements Initializable {
         signalTypeComboBox.setVisibleRowCount(11);
         setTextFieldsValidation();
         enableDisableGenerateBtn();
+        enableDisableFillFactorInput();
 
         EventHandler<ActionEvent> actionEventEventHandler = new EventHandler<ActionEvent>() {
             @Override
             public void handle(ActionEvent mouseEvent) {
                 SignalGenerator signalGenerator = SignalGeneratorFactory.getSignalGenerator((String) signalTypeComboBox.getValue());
                 if(signalGenerator == null) return;
-                Signal signal = signalGenerator.generate(Double.parseDouble(durationInput.getText()),
-                        Double.parseDouble(startingTimeInput.getText()),
-                        Double.parseDouble(amplitudeInput.getText()),
-                        Double.parseDouble(frequencyInput.getText()));
+                Signal signal;
+                if (fillFactorInput.isDisabled()) {
+                    signal = signalGenerator.generate(Double.parseDouble(durationInput.getText()),
+                            Double.parseDouble(startingTimeInput.getText()),
+                            Double.parseDouble(amplitudeInput.getText()),
+                            Double.parseDouble(frequencyInput.getText()));
+                } else {
+                    signal = signalGenerator.generateWithFillFactor(Double.parseDouble(durationInput.getText()),
+                            Double.parseDouble(startingTimeInput.getText()),
+                            Double.parseDouble(amplitudeInput.getText()),
+                            Double.parseDouble(frequencyInput.getText()),
+                            Double.parseDouble(fillFactorInput.getText()));
+                }
                 signal.setName("Signal " + LocalDateTime.now().toString());
                 drawSignalCurve(signal);
                 drawHistogram(signal);
@@ -134,7 +142,7 @@ public class ViewController implements Initializable {
         textFieldList.add(startingTimeInput);
         textFieldList.add(amplitudeInput);
         textFieldList.add(frequencyInput);
-        textFieldList.add(durationInput);
+        textFieldList.add(fillFactorInput);
         for (TextField field : textFieldList) {
             field.textProperty().addListener(new ChangeListener<String>() {
                 @Override
@@ -153,16 +161,33 @@ public class ViewController implements Initializable {
                 super.bind(durationInput.textProperty(),
                         startingTimeInput.textProperty(),
                         amplitudeInput.textProperty(),
-                        frequencyInput.textProperty());
+                        frequencyInput.textProperty(),
+                        fillFactorInput.textProperty());
             }
             @Override
             protected boolean computeValue() {
                 return (durationInput.getText().isEmpty()
                         || startingTimeInput.getText().isEmpty()
                         || amplitudeInput.getText().isEmpty()
-                        || frequencyInput.getText().isEmpty());
+                        || frequencyInput.getText().isEmpty()
+                        || (!fillFactorInput.isDisabled() && fillFactorInput.getText().isEmpty()));
             }
         };
         generateButton.disableProperty().bind(binding);
+    }
+
+    private void enableDisableFillFactorInput() {
+        signalTypeComboBox.valueProperty().addListener(((observableValue, oldValue, newValue) -> {
+            ArrayList<String> allowedSignals = new ArrayList<>(Arrays.asList(
+                    "S6: Sygnał prostokątny",
+                    "S7: Sygnał prostokątny symetryczny",
+                    "S8: Sygnał trójkątny"
+            ));
+            if (allowedSignals.contains(newValue)) {
+                fillFactorInput.setDisable(false);
+            } else {
+                fillFactorInput.setDisable(true);
+            }
+        }));
     }
 }
