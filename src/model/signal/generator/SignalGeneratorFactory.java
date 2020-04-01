@@ -36,6 +36,9 @@ public class SignalGeneratorFactory {
             case SIGNAL_TYPE_S6_VALUE: {
                 return new RectangularSignalGenerator();
             }
+            case SIGNAL_TYPE_S9_VALUE: {
+                return new HeavisideStepGenerator();
+            }
         }
         return null;
     }

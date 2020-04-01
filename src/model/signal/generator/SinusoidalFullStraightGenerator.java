@@ -27,4 +27,9 @@ public class SinusoidalFullStraightGenerator implements SignalGenerator {
     public Signal generateWithFillFactor(Double duration, Double beginTime, Double amplitude, Double frequency, Double fillFactor) {
         return null;
     }
+
+    @Override
+    public Signal generateWithJumpTime(Double duration, Double beginTime, Double amplitude, Double jumpTime) {
+        return null;
+    }
 }

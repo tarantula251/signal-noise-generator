@@ -67,12 +67,7 @@ public class Signal {
         this.duration = duration;
         this.amplitude = amplitude;
         this.frequency = frequency;
-
-        calculateAverage();
-        calculateAbsoluteAverage();
-        calculateAveragePower();
-        calculateEffectiveValue();
-        calculateVariance();
+        calculateSignalParameters();
     }
 
     public Signal(ArrayList<Sample> samples, double duration, double amplitude, double frequency, double fillFactor) {
@@ -81,6 +76,14 @@ public class Signal {
         this.amplitude = amplitude;
         this.frequency = frequency;
         this.fillFactor = fillFactor;
+        calculateSignalParameters();
+    }
+
+    public Signal(ArrayList<Sample> samples, double duration, double amplitude) {
+        this.samples = samples;
+        this.duration = duration;
+        this.amplitude = amplitude;
+        calculateSignalParameters();
     }
 
     public String getName() {
@@ -128,5 +131,13 @@ public class Signal {
 
     public double getVariance() {
         return variance;
+    }
+
+    private void calculateSignalParameters() {
+        calculateAverage();
+        calculateAbsoluteAverage();
+        calculateAveragePower();
+        calculateEffectiveValue();
+        calculateVariance();
     }
 }

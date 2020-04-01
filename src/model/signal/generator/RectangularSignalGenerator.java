@@ -28,6 +28,11 @@ public class RectangularSignalGenerator implements SignalGenerator {
     }
 
     @Override
+    public Signal generateWithJumpTime(Double duration, Double beginTime, Double amplitude, Double jumpTime) {
+        return null;
+    }
+
+    @Override
     public Signal generate(Double duration, Double beginTime, Double amplitude, Double frequency) {
         return null;
     }

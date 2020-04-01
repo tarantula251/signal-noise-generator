@@ -11,7 +11,6 @@ import javafx.scene.chart.BarChart;
 import javafx.scene.chart.LineChart;
 import javafx.scene.chart.XYChart;
 import javafx.scene.control.*;
-import javafx.scene.input.DragEvent;
 import model.signal.Sample;
 import model.signal.Signal;
 import model.signal.generator.SignalGenerator;
@@ -30,6 +29,7 @@ public class ViewController implements Initializable {
     @FXML private TextField amplitudeInput;
     @FXML private TextField frequencyInput;
     @FXML private TextField fillFactorInput;
+    @FXML private TextField jumpTimeInput;
     @FXML private LineChart<Number, Number> lineChart;
     @FXML private BarChart<Number, Number> barChart;
     @FXML private Button generateButton;
@@ -72,25 +72,33 @@ public class ViewController implements Initializable {
         signalTypeComboBox.setVisibleRowCount(11);
         setTextFieldsValidation();
         enableDisableGenerateBtn();
-        enableDisableFillFactorInput();
+        enableDisableTextInputs();
 
         EventHandler<ActionEvent> generateButtonActionEventEventHandler = new EventHandler<ActionEvent>() {
             @Override
             public void handle(ActionEvent mouseEvent) {
                 SignalGenerator signalGenerator = SignalGeneratorFactory.getSignalGenerator((String) signalTypeComboBox.getValue());
                 if(signalGenerator == null) return;
+                String generatorClassName = String.valueOf(signalGenerator.getClass());
                 Signal signal;
-                if (fillFactorInput.isDisabled()) {
-                    signal = signalGenerator.generate(Double.parseDouble(durationInput.getText()),
-                            Double.parseDouble(startingTimeInput.getText()),
-                            Double.parseDouble(amplitudeInput.getText()),
-                            Double.parseDouble(frequencyInput.getText()));
-                } else {
+                HashSet<String> fillFactorClassNames = new HashSet<>(Arrays.asList("class model.signal.generator.RectangularSignalGenerator"));
+                HashSet<String> jumpTimeClassNames = new HashSet<>(Arrays.asList("class model.signal.generator.HeavisideStepGenerator"));
+                if (fillFactorClassNames.contains(generatorClassName)) {
                     signal = signalGenerator.generateWithFillFactor(Double.parseDouble(durationInput.getText()),
                             Double.parseDouble(startingTimeInput.getText()),
                             Double.parseDouble(amplitudeInput.getText()),
                             Double.parseDouble(frequencyInput.getText()),
                             Double.parseDouble(fillFactorInput.getText()));
+                } else if (jumpTimeClassNames.contains(generatorClassName)) {
+                    signal = signalGenerator.generateWithJumpTime(Double.parseDouble(durationInput.getText()),
+                            Double.parseDouble(startingTimeInput.getText()),
+                            Double.parseDouble(amplitudeInput.getText()),
+                            Double.parseDouble(jumpTimeInput.getText()));
+                } else {
+                    signal = signalGenerator.generate(Double.parseDouble(durationInput.getText()),
+                            Double.parseDouble(startingTimeInput.getText()),
+                            Double.parseDouble(amplitudeInput.getText()),
+                            Double.parseDouble(frequencyInput.getText()));
                 }
                 signal.setName("Signal " + LocalDateTime.now().toString());
 
@@ -184,31 +192,41 @@ public class ViewController implements Initializable {
                         startingTimeInput.textProperty(),
                         amplitudeInput.textProperty(),
                         frequencyInput.textProperty(),
-                        fillFactorInput.textProperty());
+                        fillFactorInput.textProperty(),
+                        jumpTimeInput.textProperty());
             }
             @Override
             protected boolean computeValue() {
                 return (durationInput.getText().isEmpty()
                         || startingTimeInput.getText().isEmpty()
                         || amplitudeInput.getText().isEmpty()
-                        || frequencyInput.getText().isEmpty()
-                        || (!fillFactorInput.isDisabled() && fillFactorInput.getText().isEmpty()));
+                        || (!frequencyInput.isDisabled() && frequencyInput.getText().isEmpty())
+                        || (!fillFactorInput.isDisabled() && fillFactorInput.getText().isEmpty())
+                        || (!jumpTimeInput.isDisabled() && jumpTimeInput.getText().isEmpty()));
             }
         };
         generateButton.disableProperty().bind(binding);
     }
 
-    private void enableDisableFillFactorInput() {
+    private void enableDisableTextInputs() {
         signalTypeComboBox.valueProperty().addListener(((observableValue, oldValue, newValue) -> {
-            ArrayList<String> allowedSignals = new ArrayList<>(Arrays.asList(
+            ArrayList<String> factorAllowedSignals = new ArrayList<>(Arrays.asList(
                     "S6: Sygnał prostokątny",
                     "S7: Sygnał prostokątny symetryczny",
                     "S8: Sygnał trójkątny"
             ));
-            if (allowedSignals.contains(newValue)) {
+            String jumpTimeAllowedSignal = "S9: Skok jednostkowy";
+            if (factorAllowedSignals.contains(newValue)) {
                 fillFactorInput.setDisable(false);
             } else {
                 fillFactorInput.setDisable(true);
+            }
+            if (jumpTimeAllowedSignal.equalsIgnoreCase(String.valueOf(newValue))) {
+                jumpTimeInput.setDisable(false);
+                frequencyInput.setDisable(true);
+            } else {
+                frequencyInput.setDisable(false);
+                jumpTimeInput.setDisable(true);
             }
         }));
     }
