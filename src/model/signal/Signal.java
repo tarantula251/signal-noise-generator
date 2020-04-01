@@ -10,12 +10,69 @@ public class Signal {
     private double amplitude;
     private double frequency;
     private double fillFactor;
+    private double average;
+    private double absoluteAverage;
+    private double averagePower;
+    private double effectiveValue;
+    private double variance;
+
+
+    private void calculateAverage()
+    {
+        average = 0;
+        for(Sample sample : samples)
+        {
+            average += sample.value;
+        }
+        average /= samples.size();
+    }
+
+    private void calculateAbsoluteAverage()
+    {
+        absoluteAverage = 0;
+        for(Sample sample : samples)
+        {
+            absoluteAverage += Math.abs(sample.value);
+        }
+        absoluteAverage /= samples.size();
+    }
+
+    private void calculateAveragePower()
+    {
+        averagePower = 0;
+        for(Sample sample : samples)
+        {
+            averagePower += Math.pow(sample.value, 2);
+        }
+        averagePower /= samples.size();
+    }
+
+    private void calculateEffectiveValue()
+    {
+        effectiveValue = Math.sqrt(averagePower);
+    }
+
+    private void calculateVariance()
+    {
+        variance = 0;
+        for(Sample sample : samples)
+        {
+            variance += Math.pow(sample.value - average, 2);
+        }
+        variance /= samples.size();
+    }
 
     public Signal(ArrayList<Sample> samples, double duration, double amplitude, double frequency) {
         this.samples = samples;
         this.duration = duration;
         this.amplitude = amplitude;
         this.frequency = frequency;
+
+        calculateAverage();
+        calculateAbsoluteAverage();
+        calculateAveragePower();
+        calculateEffectiveValue();
+        calculateVariance();
     }
 
     public Signal(ArrayList<Sample> samples, double duration, double amplitude, double frequency, double fillFactor) {
@@ -52,5 +109,24 @@ public class Signal {
 
     public double getFillFactor() {
         return fillFactor;
+    }
+    public double getAverage() {
+        return average;
+    }
+
+    public double getAbsoluteAverage() {
+        return absoluteAverage;
+    }
+
+    public double getAveragePower() {
+        return averagePower;
+    }
+
+    public double getEffectiveValue() {
+        return effectiveValue;
+    }
+
+    public double getVariance() {
+        return variance;
     }
 }

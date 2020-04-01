@@ -33,7 +33,7 @@
             <ColumnConstraints maxWidth="29.0" minWidth="22.0" prefWidth="22.0" />
             <ColumnConstraints halignment="LEFT" hgrow="ALWAYS" prefWidth="350.0" />
             <ColumnConstraints halignment="LEFT" hgrow="ALWAYS" prefWidth="350.0" />
-            <ColumnConstraints halignment="LEFT" hgrow="ALWAYS" prefWidth="200.0" />
+            <ColumnConstraints fillWidth="false" halignment="LEFT" hgrow="NEVER" prefWidth="200.0" />
          </columnConstraints>
          <rowConstraints>
             <RowConstraints />
@@ -124,15 +124,15 @@
                <children>
                   <Label text="Parametry sygnału:" underline="true" />
                   <Label text="Wartość średnia:" />
-                  <Label id="avgVal" text="0" />
+                  <Label id="avgVal" fx:id="averageLabel" text="0" />
                   <Label text="Wartość średnia bezwzględna:" />
-                  <Label id="avgAbsoluteVal" text="0" />
+                  <Label id="avgAbsoluteVal" fx:id="absoluteAverageLabel" text="0" />
                   <Label text="Wartość skuteczna:" />
-                  <Label id="rationaleVal" text="0" />
+                  <Label id="rationaleVal" fx:id="effectiveValueLabel" text="0" />
                   <Label text="Wariancja:" />
-                  <Label id="varianceVal" text="0" />
+                  <Label id="varianceVal" fx:id="varianceLabel" text="0" />
                   <Label text="Moc średnia:" />
-                  <Label id="avgPowerVal" text="0" />
+                  <Label id="avgPowerVal" fx:id="averagePowerLabel" text="0" />
                </children>
             </VBox>
          </children>

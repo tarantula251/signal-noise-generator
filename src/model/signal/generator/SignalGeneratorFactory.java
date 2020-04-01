@@ -21,7 +21,9 @@ public class SignalGeneratorFactory {
             case SIGNAL_TYPE_S1_VALUE: {
                 return new UniformDistributionSignalGenerator();
             }
-            //TODO Add signal s2
+            case SIGNAL_TYPE_S2_VALUE: {
+                return new GaussianSignalGenerator();
+            }
             case SIGNAL_TYPE_S3_VALUE: {
                 return new SinusoidalSignalGenerator();
             }

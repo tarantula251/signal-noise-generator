@@ -10,16 +10,15 @@ import javafx.fxml.Initializable;
 import javafx.scene.chart.BarChart;
 import javafx.scene.chart.LineChart;
 import javafx.scene.chart.XYChart;
-import javafx.scene.control.Button;
-import javafx.scene.control.ComboBox;
-import javafx.scene.control.Slider;
-import javafx.scene.control.TextField;
+import javafx.scene.control.*;
+import javafx.scene.input.DragEvent;
 import model.signal.Sample;
 import model.signal.Signal;
 import model.signal.generator.SignalGenerator;
 import model.signal.generator.SignalGeneratorFactory;
 
 import java.net.URL;
+import java.text.DecimalFormat;
 import java.time.LocalDateTime;
 import java.util.*;
 
@@ -35,6 +34,14 @@ public class ViewController implements Initializable {
     @FXML private BarChart<Number, Number> barChart;
     @FXML private Button generateButton;
     @FXML private Slider intervalSlider;
+    @FXML private Label averageLabel;
+    @FXML private Label absoluteAverageLabel;
+    @FXML private Label averagePowerLabel;
+    @FXML private Label effectiveValueLabel;
+    @FXML private Label varianceLabel;
+    private ArrayList<Signal> loadedSignals = new ArrayList<>();
+
+    private static DecimalFormat decimalFormat = new DecimalFormat("#.##");
 
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
@@ -67,7 +74,7 @@ public class ViewController implements Initializable {
         enableDisableGenerateBtn();
         enableDisableFillFactorInput();
 
-        EventHandler<ActionEvent> actionEventEventHandler = new EventHandler<ActionEvent>() {
+        EventHandler<ActionEvent> generateButtonActionEventEventHandler = new EventHandler<ActionEvent>() {
             @Override
             public void handle(ActionEvent mouseEvent) {
                 SignalGenerator signalGenerator = SignalGeneratorFactory.getSignalGenerator((String) signalTypeComboBox.getValue());
@@ -86,17 +93,25 @@ public class ViewController implements Initializable {
                             Double.parseDouble(fillFactorInput.getText()));
                 }
                 signal.setName("Signal " + LocalDateTime.now().toString());
+
+                loadedSignals.clear();
+                loadedSignals.add(signal);
+
+                lineChart.getData().clear();
                 drawSignalCurve(signal);
+
+                barChart.getData().clear();
                 drawHistogram(signal);
+
+                displaySignalParameters(signal);
             }
         };
-        generateButton.setOnAction(actionEventEventHandler);
+        generateButton.setOnAction(generateButtonActionEventEventHandler);
     }
 
     private void drawSignalCurve(Signal signal)
     {
         if(signal == null) return;
-        lineChart.getData().clear();
         lineChart.getData().add(new XYChart.Series<Number, Number>());
         lineChart.setCreateSymbols(false);
         XYChart.Series series = lineChart.getData().get(0);
@@ -126,7 +141,6 @@ public class ViewController implements Initializable {
         }
         if(histogramIntervals.isEmpty()) return;
 
-        barChart.getData().clear();
         barChart.getData().add(new BarChart.Series<>());
         BarChart.Series series = barChart.getData().get(0);
         series.setName(signal.getName());
@@ -136,6 +150,14 @@ public class ViewController implements Initializable {
         }
     }
 
+    private void displaySignalParameters(Signal signal)
+    {
+        averageLabel.setText(decimalFormat.format(signal.getAverage()));
+        absoluteAverageLabel.setText(decimalFormat.format(signal.getAbsoluteAverage()));
+        averagePowerLabel.setText(decimalFormat.format(signal.getAveragePower()));
+        effectiveValueLabel.setText(decimalFormat.format(signal.getEffectiveValue()));
+        varianceLabel.setText(decimalFormat.format(signal.getVariance()));
+    }
     private void setTextFieldsValidation() {
         ArrayList<TextField> textFieldList = new ArrayList<>();
         textFieldList.add(durationInput);
