@@ -81,7 +81,7 @@ public class ViewController implements Initializable {
                 if(signalGenerator == null) return;
                 String generatorClassName = String.valueOf(signalGenerator.getClass());
                 Signal signal;
-                HashSet<String> fillFactorClassNames = new HashSet<>(Arrays.asList("class model.signal.generator.RectangularSignalGenerator"));
+                HashSet<String> fillFactorClassNames = new HashSet<>(Arrays.asList("class model.signal.generator.RectangularSignalGenerator", "class model.signal.generator.RectangularSymmetricSignalGenerator"));
                 HashSet<String> jumpTimeClassNames = new HashSet<>(Arrays.asList("class model.signal.generator.HeavisideStepGenerator"));
                 if (fillFactorClassNames.contains(generatorClassName)) {
                     signal = signalGenerator.generateWithFillFactor(Double.parseDouble(durationInput.getText()),
