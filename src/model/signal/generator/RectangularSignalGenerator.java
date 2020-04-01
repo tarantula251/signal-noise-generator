@@ -6,29 +6,23 @@ import model.signal.Signal;
 import java.util.ArrayList;
 
 public class RectangularSignalGenerator implements SignalGenerator {
-    private static final int SAMPLES_COUNTER = 100;
+    private static final int SAMPLES_PER_PERIOD = 48;
 
     @Override
     public Signal generateWithFillFactor(Double duration, Double beginTime, Double amplitude, Double frequency, Double fillFactor) {
         ArrayList<Sample> samples = new ArrayList<>();
         double period = 1 / frequency;
-        int samplesCount = SAMPLES_COUNTER;
+        int samplesCount = (int)(duration / (period / SAMPLES_PER_PERIOD));
         double samplesDistance = duration / samplesCount;
-
-        //TODO fix
-        for(double i = 0; i < samplesCount; i+=0.1)
+        for(int i = 0; i < samplesCount; ++i)
         {
-            int K = 1;
+            int K = i  / SAMPLES_PER_PERIOD;
             double time = beginTime + (i * samplesDistance);
-            double amplitudeLeftLimit = K * period + beginTime;
-            double rightLimit = fillFactor * period + K + period + beginTime;
-            double zeroLeftLimit = fillFactor * period - K * period + beginTime;
-
-            if (time >= amplitudeLeftLimit && time < rightLimit) {
+            double leftBound = K * period + beginTime;
+            double rightBound = fillFactor * period + leftBound;
+            if (time >= leftBound && time < rightBound) {
                 samples.add(new Sample(time, amplitude));
-            } else if (time >= zeroLeftLimit && time < rightLimit) {
-                samples.add(new Sample(time, 0));
-            }
+            } else samples.add(new Sample(time, 0));
         }
         return new Signal(samples, duration, amplitude, frequency, fillFactor);
     }
