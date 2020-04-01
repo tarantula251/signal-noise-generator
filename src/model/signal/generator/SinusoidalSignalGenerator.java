@@ -6,7 +6,7 @@ import model.signal.Signal;
 import java.util.ArrayList;
 
 public class SinusoidalSignalGenerator implements SignalGenerator {
-    private static final int SAMPLES_PER_PERIOD = 25; //This value should be probably chosen by user
+    private static final int SAMPLES_PER_PERIOD = 25;
     @Override
     public Signal generate(Double duration, Double beginTime, Double amplitude, Double frequency) {
         ArrayList<Sample> samples = new ArrayList<>();

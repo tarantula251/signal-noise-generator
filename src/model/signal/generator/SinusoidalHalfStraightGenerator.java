@@ -6,15 +6,15 @@ import model.signal.Signal;
 import java.util.ArrayList;
 
 public class SinusoidalHalfStraightGenerator implements SignalGenerator {
-    private static final int SAMPLES_COUNTER = 100;
+    private static final int SAMPLES_PER_PERIOD = 525;
     @Override
     public Signal generate(Double duration, Double beginTime, Double amplitude, Double frequency) {
         ArrayList<Sample> samples = new ArrayList<>();
         double period = 1 / frequency;
-        int samplesCount = SAMPLES_COUNTER;
+        int samplesCount = (int)(duration / (period / SAMPLES_PER_PERIOD));
         double samplesDistance = duration / samplesCount;
 
-        for(double i = 0; i < samplesCount; i+=0.1)
+        for(double i = 0; i <= samplesCount; ++i)
         {
             double angleVal = 2 * Math.PI * (i * samplesDistance - beginTime) / period;
             samples.add(new Sample(beginTime + (i * samplesDistance),
