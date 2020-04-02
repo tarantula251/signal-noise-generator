@@ -1,8 +1,9 @@
 package model.signal;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 
-public class Signal {
+public class Signal implements Serializable {
 
     private String name;
     private ArrayList<Sample> samples;
@@ -16,6 +17,20 @@ public class Signal {
     private double effectiveValue;
     private double variance;
 
+    @Override
+    public String toString() {
+        return  "name='" + name + '\'' +
+                "\nduration=" + duration +
+                "\namplitude=" + amplitude +
+                "\nfrequency=" + frequency +
+                "\nfillFactor=" + fillFactor +
+                "\naverage=" + average +
+                "\nabsoluteAverage=" + absoluteAverage +
+                "\naveragePower=" + averagePower +
+                "\neffectiveValue=" + effectiveValue +
+                "\nvariance=" + variance +
+                "\nsamples=" + samples;
+    }
 
     private void calculateAverage()
     {

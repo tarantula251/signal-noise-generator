@@ -11,11 +11,13 @@ import javafx.scene.chart.BarChart;
 import javafx.scene.chart.LineChart;
 import javafx.scene.chart.XYChart;
 import javafx.scene.control.*;
+import javafx.stage.FileChooser;
 import model.signal.Sample;
 import model.signal.Signal;
 import model.signal.generator.SignalGenerator;
 import model.signal.generator.SignalGeneratorFactory;
 
+import java.io.*;
 import java.net.URL;
 import java.text.DecimalFormat;
 import java.time.LocalDateTime;
@@ -39,6 +41,8 @@ public class ViewController implements Initializable {
     @FXML private Label averagePowerLabel;
     @FXML private Label effectiveValueLabel;
     @FXML private Label varianceLabel;
+    @FXML private MenuBar menuBar;
+    @FXML private MenuItem exportMenuItem;
     private ArrayList<Signal> loadedSignals = new ArrayList<>();
 
     private static DecimalFormat decimalFormat = new DecimalFormat("#.##");
@@ -116,7 +120,22 @@ public class ViewController implements Initializable {
                 displaySignalParameters(signal);
             }
         };
+
+        EventHandler<ActionEvent> exportMenuItemActionEventEventHandler = new EventHandler<ActionEvent>() {
+            @Override
+            public void handle(ActionEvent actionEvent) {
+                if(loadedSignals.size() == 0) return;
+                try {
+                    exportSignal(loadedSignals.get(0));
+                } catch (IOException e) {
+                    e.printStackTrace();
+                    System.err.println(e.getMessage());
+                }
+            }
+        };
+
         generateButton.setOnAction(generateButtonActionEventEventHandler);
+        exportMenuItem.setOnAction(exportMenuItemActionEventEventHandler);
     }
 
     private void drawSignalCurve(Signal signal)
@@ -231,5 +250,35 @@ public class ViewController implements Initializable {
                 jumpTimeInput.setDisable(true);
             }
         }));
+    }
+
+    private void exportSignal(Signal signal) throws IOException {
+        FileChooser exportSignalFileChooser = new FileChooser();
+        FileChooser.ExtensionFilter sigExtensionFilter = new FileChooser.ExtensionFilter("Signal file", "*.sig");
+        FileChooser.ExtensionFilter txtExtensionFilter = new FileChooser.ExtensionFilter("Text file", "*.txt");
+        exportSignalFileChooser.getExtensionFilters().add(sigExtensionFilter);
+        exportSignalFileChooser.getExtensionFilters().add(txtExtensionFilter);
+        exportSignalFileChooser.setInitialFileName(signal.getName());
+
+        File file = exportSignalFileChooser.showSaveDialog(menuBar.getScene().getWindow());
+
+        if(file == null) return;
+
+        if(!file.createNewFile()) System.out.println("File already exist. Overriding.");
+
+        String fileType = exportSignalFileChooser.getSelectedExtensionFilter().getDescription();
+
+        if(fileType.equals("Signal file"))
+        {
+            ObjectOutputStream objectOutputStream = new ObjectOutputStream(new FileOutputStream(file));
+            objectOutputStream.writeObject(signal);
+            objectOutputStream.close();
+        }
+        else
+        {
+            PrintWriter printWriter = new PrintWriter(new FileOutputStream(file));
+            printWriter.println(signal.toString());
+            printWriter.close();
+        }
     }
 }
