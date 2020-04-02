@@ -43,6 +43,7 @@ public class ViewController implements Initializable {
     @FXML private Label varianceLabel;
     @FXML private MenuBar menuBar;
     @FXML private MenuItem exportMenuItem;
+    @FXML private MenuItem importMenuItem;
     private ArrayList<Signal> loadedSignals = new ArrayList<>();
 
     private static DecimalFormat decimalFormat = new DecimalFormat("#.##");
@@ -53,6 +54,7 @@ public class ViewController implements Initializable {
         lineChart.setTitle("Krzywa sygnału");
         lineChart.getXAxis().setLabel("Czas");
         lineChart.getYAxis().setLabel("Wartość");
+        lineChart.setCreateSymbols(false);
 
         barChart.setTitle("Rozkład wartości próbek");
         barChart.getXAxis().setLabel("Wartość");
@@ -106,7 +108,7 @@ public class ViewController implements Initializable {
                             Double.parseDouble(amplitudeInput.getText()),
                             Double.parseDouble(frequencyInput.getText()));
                 }
-                signal.setName("Signal " + LocalDateTime.now().toString());
+                signal.setName("Signal " + LocalDateTime.now().toString().replace('.', '_').replace(':', '_'));
 
                 loadedSignals.clear();
                 loadedSignals.add(signal);
@@ -134,16 +136,33 @@ public class ViewController implements Initializable {
             }
         };
 
+        EventHandler<ActionEvent> importMenuItemActionEventEventHandler = new EventHandler<ActionEvent>() {
+            @Override
+            public void handle(ActionEvent actionEvent) {
+                try {
+                    loadedSignals = importSignals();
+                    for(Signal signal : loadedSignals)
+                    {
+                        drawSignalCurve(signal);
+                        drawHistogram(signal);
+                    }
+                } catch (IOException e) {
+                    e.printStackTrace();
+                    System.err.println(e.getMessage());
+                }
+            }
+        };
+
         generateButton.setOnAction(generateButtonActionEventEventHandler);
         exportMenuItem.setOnAction(exportMenuItemActionEventEventHandler);
+        importMenuItem.setOnAction(importMenuItemActionEventEventHandler);
     }
 
     private void drawSignalCurve(Signal signal)
     {
         if(signal == null) return;
         lineChart.getData().add(new XYChart.Series<Number, Number>());
-        lineChart.setCreateSymbols(false);
-        XYChart.Series series = lineChart.getData().get(0);
+        XYChart.Series series = lineChart.getData().get(lineChart.getData().size() - 1);
         series.setName(signal.getName());
         for(Sample sample : signal.getSamples())
         {
@@ -171,7 +190,7 @@ public class ViewController implements Initializable {
         if(histogramIntervals.isEmpty()) return;
 
         barChart.getData().add(new BarChart.Series<>());
-        BarChart.Series series = barChart.getData().get(0);
+        BarChart.Series series = barChart.getData().get(barChart.getData().size() - 1);
         series.setName(signal.getName());
         for(Map.Entry<Integer, Integer> histogramInterval : histogramIntervals.entrySet())
         {
@@ -280,5 +299,32 @@ public class ViewController implements Initializable {
             printWriter.println(signal.toString());
             printWriter.close();
         }
+    }
+
+    private ArrayList<Signal> importSignals() throws IOException {
+        ArrayList<Signal> importedSignals = new ArrayList<>();
+        FileChooser exportSignalFileChooser = new FileChooser();
+        FileChooser.ExtensionFilter sigExtensionFilter = new FileChooser.ExtensionFilter("Signal file", "*.sig");
+        exportSignalFileChooser.getExtensionFilters().add(sigExtensionFilter);
+
+        List<File> files = exportSignalFileChooser.showOpenMultipleDialog(menuBar.getScene().getWindow());
+
+        for(File file : files)
+        {
+            if(file == null) continue;;
+
+            ObjectInputStream objectInputStream = new ObjectInputStream(new FileInputStream(file));
+
+            try {
+                Signal signal = (Signal)objectInputStream.readObject();
+                importedSignals.add(signal);
+            } catch (ClassNotFoundException e) {
+                System.err.println(e.getMessage());
+            }
+
+            objectInputStream.close();
+        }
+
+        return importedSignals;
     }
 }

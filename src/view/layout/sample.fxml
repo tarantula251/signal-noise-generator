@@ -20,7 +20,7 @@
           <Menu mnemonicParsing="false" text="Plik">
             <items>
                   <MenuItem fx:id="exportMenuItem" mnemonicParsing="false" text="Eksportuj..." />
-                  <MenuItem mnemonicParsing="false" text="Importuj..." />
+                  <MenuItem fx:id="importMenuItem" mnemonicParsing="false" text="Importuj..." />
                   <SeparatorMenuItem mnemonicParsing="false" />
               <MenuItem mnemonicParsing="false" text="Zamknij" />
             </items>
