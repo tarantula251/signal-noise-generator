@@ -14,7 +14,7 @@ public class RectangularSymmetricSignalGenerator implements SignalGenerator {
         double period = 1 / frequency;
         int samplesCount = (int)(duration / (period / SAMPLES_PER_PERIOD));
         double samplesDistance = duration / samplesCount;
-        for(int i = 0; i < samplesCount; ++i)
+        for(int i = 0; i <= samplesCount; ++i)
         {
             int K = i  / SAMPLES_PER_PERIOD;
             double time = beginTime + (i * samplesDistance);
