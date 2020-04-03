@@ -7,9 +7,7 @@ import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
-import javafx.scene.chart.BarChart;
-import javafx.scene.chart.LineChart;
-import javafx.scene.chart.XYChart;
+import javafx.scene.chart.*;
 import javafx.scene.control.*;
 import javafx.stage.FileChooser;
 import model.signal.Sample;
@@ -32,8 +30,11 @@ public class ViewController implements Initializable {
     @FXML private TextField frequencyInput;
     @FXML private TextField fillFactorInput;
     @FXML private TextField jumpTimeInput;
+    @FXML private TextField sampleNumberInput;
     @FXML private LineChart<Number, Number> lineChart;
     @FXML private BarChart<Number, Number> barChart;
+    @FXML private ScatterChart<Number, Number> scatterChart;
+    @FXML private NumberAxis scatterXAxis;
     @FXML private Button generateButton;
     @FXML private Slider intervalSlider;
     @FXML private Label averageLabel;
@@ -91,6 +92,8 @@ public class ViewController implements Initializable {
                         "class model.signal.generator.RectangularSymmetricSignalGenerator",
                         "class model.signal.generator.TriangularSignalGenerator"));
                 HashSet<String> jumpTimeClassNames = new HashSet<>(Arrays.asList("class model.signal.generator.HeavisideStepGenerator"));
+                HashSet<String> sampleNumberForJumpClassNames = new HashSet<>(Arrays.asList("class model.signal.generator.UnitPulseGenerator"));
+                boolean hideLineChart = false;
                 if (fillFactorClassNames.contains(generatorClassName)) {
                     signal = signalGenerator.generateWithFillFactor(Double.parseDouble(durationInput.getText()),
                             Double.parseDouble(startingTimeInput.getText()),
@@ -102,6 +105,13 @@ public class ViewController implements Initializable {
                             Double.parseDouble(startingTimeInput.getText()),
                             Double.parseDouble(amplitudeInput.getText()),
                             Double.parseDouble(jumpTimeInput.getText()));
+                } else if (sampleNumberForJumpClassNames.contains(generatorClassName)) {
+                    hideLineChart = true;
+                    signal = signalGenerator.generateWithSampleNrForJump(Double.parseDouble(durationInput.getText()),
+                            Double.parseDouble(startingTimeInput.getText()),
+                            Double.parseDouble(amplitudeInput.getText()),
+                            Double.parseDouble(frequencyInput.getText()),
+                            Integer.parseInt(sampleNumberInput.getText()));
                 } else {
                     signal = signalGenerator.generate(Double.parseDouble(durationInput.getText()),
                             Double.parseDouble(startingTimeInput.getText()),
@@ -113,8 +123,20 @@ public class ViewController implements Initializable {
                 loadedSignals.clear();
                 loadedSignals.add(signal);
 
-                lineChart.getData().clear();
-                drawSignalCurve(signal);
+                if (!hideLineChart) {
+                    if (scatterChart.isVisible()) scatterChart.setVisible(false);
+                    if (!lineChart.isVisible()) lineChart.setVisible(true);
+                    lineChart.getData().clear();
+                    drawSignalCurve(signal);
+                } else {
+                    if (lineChart.isVisible()) lineChart.setVisible(false);
+                    if (!scatterChart.isVisible()) scatterChart.setVisible(true);
+                    scatterChart.setTitle("Próbki sygnału");
+                    scatterChart.getXAxis().setLabel("Czas");
+                    scatterChart.getYAxis().setLabel("Wartość");
+                    scatterChart.getData().clear();
+                    drawSignalPoints(signal);
+                }
 
                 barChart.getData().clear();
                 drawHistogram(signal);
@@ -161,14 +183,36 @@ public class ViewController implements Initializable {
     private void drawSignalCurve(Signal signal)
     {
         if(signal == null) return;
-        lineChart.getData().add(new XYChart.Series<Number, Number>());
-        XYChart.Series series = lineChart.getData().get(lineChart.getData().size() - 1);
-        series.setName(signal.getName());
-        for(Sample sample : signal.getSamples())
-        {
-            series.getData().add(new XYChart.Data<Number, Number>(sample.time, sample.value));
+        if (lineChart.isVisible()) {
+            lineChart.getData().add(new XYChart.Series<Number, Number>());
+            XYChart.Series series = lineChart.getData().get(lineChart.getData().size() - 1);
+            series.setName(signal.getName());
+            for(Sample sample : signal.getSamples())
+            {
+                series.getData().add(new XYChart.Data<Number, Number>(sample.time, sample.value));
+            }
         }
     }
+
+    private void drawSignalPoints(Signal signal)
+    {
+        if(signal == null) return;
+        if (scatterChart.isVisible()) {
+            scatterChart.getData().add(new XYChart.Series<Number, Number>());
+            XYChart.Series series = scatterChart.getData().get(scatterChart.getData().size() - 1);
+            series.setName(signal.getName());
+            double minTime = signal.getSamples().get(0).time;
+            double maxTime = signal.getSamples().get(signal.getSamples().size() - 1).time;
+            for (Sample sample : signal.getSamples()) {
+                series.getData().add(new XYChart.Data<Number, Number>(sample.time, sample.value));
+            }
+            // adjust bounds of x axis
+            scatterChart.getXAxis().setAutoRanging(false);
+            scatterXAxis.setUpperBound(maxTime + 1.0);
+            scatterXAxis.setLowerBound(minTime - 1.0);
+        }
+    }
+
 
     private void drawHistogram(Signal signal)
     {
@@ -212,7 +256,7 @@ public class ViewController implements Initializable {
         textFieldList.add(startingTimeInput);
         textFieldList.add(amplitudeInput);
         textFieldList.add(frequencyInput);
-        textFieldList.add(fillFactorInput);
+        textFieldList.add(jumpTimeInput);
         for (TextField field : textFieldList) {
             field.textProperty().addListener(new ChangeListener<String>() {
                 @Override
@@ -223,6 +267,22 @@ public class ViewController implements Initializable {
                 }
             });
         }
+        fillFactorInput.textProperty().addListener(new ChangeListener<String>() {
+            @Override
+            public void changed(ObservableValue<? extends String> observableValue, String oldValue, String newValue) {
+                if (!newValue.matches("[0]?(\\.\\d*)?|[1]")) {
+                    fillFactorInput.setText(oldValue);
+                }
+            }
+        });
+        sampleNumberInput.textProperty().addListener(new ChangeListener<String>() {
+            @Override
+            public void changed(ObservableValue<? extends String> observableValue, String oldValue, String newValue) {
+                if (!newValue.matches("\\d+")) {
+                    sampleNumberInput.setText(oldValue);
+                }
+            }
+        });
     }
 
     private void enableDisableGenerateBtn() {
@@ -233,7 +293,8 @@ public class ViewController implements Initializable {
                         amplitudeInput.textProperty(),
                         frequencyInput.textProperty(),
                         fillFactorInput.textProperty(),
-                        jumpTimeInput.textProperty());
+                        jumpTimeInput.textProperty(),
+                        sampleNumberInput.textProperty());
             }
             @Override
             protected boolean computeValue() {
@@ -242,7 +303,8 @@ public class ViewController implements Initializable {
                         || amplitudeInput.getText().isEmpty()
                         || (!frequencyInput.isDisabled() && frequencyInput.getText().isEmpty())
                         || (!fillFactorInput.isDisabled() && fillFactorInput.getText().isEmpty())
-                        || (!jumpTimeInput.isDisabled() && jumpTimeInput.getText().isEmpty()));
+                        || (!jumpTimeInput.isDisabled() && jumpTimeInput.getText().isEmpty())
+                        || (!sampleNumberInput.isDisabled() && sampleNumberInput.getText().isEmpty()));
             }
         };
         generateButton.disableProperty().bind(binding);
@@ -256,6 +318,7 @@ public class ViewController implements Initializable {
                     "S8: Sygnał trójkątny"
             ));
             String jumpTimeAllowedSignal = "S9: Skok jednostkowy";
+            String sampleNumberAllowedSignal = "S10: Impuls jednostkowy";
             if (factorAllowedSignals.contains(newValue)) {
                 fillFactorInput.setDisable(false);
             } else {
@@ -267,6 +330,11 @@ public class ViewController implements Initializable {
             } else {
                 frequencyInput.setDisable(false);
                 jumpTimeInput.setDisable(true);
+            }
+            if (sampleNumberAllowedSignal.equalsIgnoreCase(String.valueOf(newValue))) {
+                sampleNumberInput.setDisable(false);
+            } else {
+                sampleNumberInput.setDisable(true);
             }
         }));
     }

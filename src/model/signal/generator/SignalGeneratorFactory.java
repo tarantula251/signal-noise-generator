@@ -45,6 +45,9 @@ public class SignalGeneratorFactory {
             case SIGNAL_TYPE_S9_VALUE: {
                 return new HeavisideStepGenerator();
             }
+            case SIGNAL_TYPE_S10_VALUE: {
+                return new UnitPulseGenerator();
+            }
         }
         return null;
     }

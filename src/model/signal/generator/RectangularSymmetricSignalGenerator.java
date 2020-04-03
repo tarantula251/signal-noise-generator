@@ -33,6 +33,11 @@ public class RectangularSymmetricSignalGenerator implements SignalGenerator {
     }
 
     @Override
+    public Signal generateWithSampleNrForJump(Double duration, Double beginTime, Double amplitude, Double frequency, Integer sampleNumber) {
+        return null;
+    }
+
+    @Override
     public Signal generate(Double duration, Double beginTime, Double amplitude, Double frequency) {
         return null;
     }

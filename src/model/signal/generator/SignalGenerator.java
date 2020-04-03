@@ -9,4 +9,7 @@ public interface SignalGenerator {
     Signal generateWithFillFactor(Double duration, Double beginTime, Double amplitude, Double frequency, Double fillFactor);
 
     Signal generateWithJumpTime(Double duration, Double beginTime, Double amplitude, Double jumpTime);
+
+    Signal generateWithSampleNrForJump(Double duration, Double beginTime, Double amplitude, Double frequency, Integer sampleNumber);
+
 }

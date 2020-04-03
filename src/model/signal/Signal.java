@@ -101,6 +101,13 @@ public class Signal implements Serializable {
         calculateSignalParameters();
     }
 
+    public Signal(ArrayList<Sample> samples, double duration, double amplitude, boolean isDiscreteSignal) {
+        this.samples = samples;
+        this.duration = duration;
+        this.amplitude = amplitude;
+        //TODO calculate parameters for a discrete signal
+    }
+
     public String getName() {
         return name;
     }

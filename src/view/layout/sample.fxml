@@ -72,6 +72,8 @@
                               <RowConstraints minHeight="10.0" />
                               <RowConstraints minHeight="10.0" />
                               <RowConstraints minHeight="10.0" />
+                              <RowConstraints minHeight="10.0" />
+                              <RowConstraints minHeight="10.0" />
                               <RowConstraints minHeight="10.0" valignment="TOP" vgrow="ALWAYS" />
                            </rowConstraints>
                            <children>
@@ -83,7 +85,8 @@
                               <TextField fx:id="frequencyInput" promptText="Wpisz częstotliwość [Hz]" GridPane.rowIndex="9" />
                               <TextField fx:id="fillFactorInput" disable="true" promptText="Wpisz współczynnik k" GridPane.rowIndex="13" />
                               <TextField fx:id="jumpTimeInput" disable="true" promptText="Wpisz czas skoku [s]" GridPane.rowIndex="15" />
-                              <Button fx:id="generateButton" minWidth="-Infinity" mnemonicParsing="false" prefWidth="75.0" text="Generuj" GridPane.halignment="CENTER" GridPane.rowIndex="16">
+                              <TextField fx:id="sampleNumberInput" disable="true" promptText="Wpisz number próbki dla skoku aplitudy" GridPane.rowIndex="17" />
+                              <Button fx:id="generateButton" minWidth="-Infinity" mnemonicParsing="false" prefWidth="75.0" text="Generuj" GridPane.halignment="CENTER" GridPane.rowIndex="18">
                                  <GridPane.margin>
                                     <Insets bottom="5.0" top="10.0" />
                                  </GridPane.margin>
@@ -96,6 +99,7 @@
                               <Slider fx:id="intervalSlider" blockIncrement="5" cache="true" majorTickUnit="5" max="20" min="5" minorTickCount="0" showTickLabels="true" showTickMarks="true" snapToTicks="true" value="5" GridPane.rowIndex="11" />
                               <Label text="Współczynnik wypełnienia:" GridPane.rowIndex="12" />
                               <Label text="Czas skoku:" GridPane.rowIndex="14" />
+                              <Label text="Numer próbki dla skoku:" GridPane.rowIndex="16" />
                            </children>
                         </GridPane>
                      </content>
@@ -124,6 +128,14 @@
                  <NumberAxis lowerBound="-5" side="LEFT" tickUnit="1" upperBound="5" />
               </yAxis>
             </LineChart>
+            <ScatterChart fx:id="scatterChart" visible="false" GridPane.columnIndex="2" GridPane.rowIndex="2" GridPane.rowSpan="7">
+               <xAxis>
+                  <NumberAxis fx:id="scatterXAxis" lowerBound="-5" side="BOTTOM" tickUnit="1" upperBound="5" />
+               </xAxis>
+               <yAxis>
+                  <NumberAxis fx:id="scatterYAxis" lowerBound="-5" side="LEFT" tickUnit="1" upperBound="5" />
+               </yAxis>
+            </ScatterChart>
             <VBox prefHeight="343.0" GridPane.columnIndex="4" GridPane.rowIndex="2" GridPane.rowSpan="7">
                <children>
                   <Label text="Parametry sygnału:" underline="true" />

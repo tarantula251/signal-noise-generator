@@ -30,4 +30,9 @@ public class SinusoidalSignalGenerator implements SignalGenerator {
     public Signal generateWithJumpTime(Double duration, Double beginTime, Double amplitude, Double jumpTime) {
         return null;
     }
+
+    @Override
+    public Signal generateWithSampleNrForJump(Double duration, Double beginTime, Double amplitude, Double frequency, Integer sampleNumber) {
+        return null;
+    }
 }
