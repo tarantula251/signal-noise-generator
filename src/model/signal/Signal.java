@@ -2,6 +2,7 @@ package model.signal;
 
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.function.DoubleBinaryOperator;
 
 public class Signal implements Serializable {
 
@@ -161,5 +162,40 @@ public class Signal implements Serializable {
         calculateAveragePower();
         calculateEffectiveValue();
         calculateVariance();
+    }
+
+    private boolean isCompatible(Signal signal)
+    {
+        return signal.getDuration() == duration && signal.getFrequency() == frequency && signal.getSamples().size() == samples.size();
+    }
+
+    private Signal performAction(Signal signal, DoubleBinaryOperator operator) throws SignalException {
+        if(!isCompatible(signal)) throw new SignalException("Signals are not compatible");
+
+        ArrayList<Sample> resultSamples = new ArrayList<>();
+        for(int sampleIndex = 0; sampleIndex < samples.size(); ++sampleIndex)
+        {
+            Sample leftSample = samples.get(sampleIndex);
+            Sample rightSample = signal.getSamples().get(sampleIndex);
+            resultSamples.add(new Sample(leftSample.time, operator.applyAsDouble(leftSample.value, rightSample.value)));
+        }
+
+        return new Signal(resultSamples, duration, amplitude, frequency, fillFactor);
+}
+
+    public Signal add(Signal signal) throws SignalException {
+        return performAction(signal, Double::sum);
+    }
+
+    public Signal subtract(Signal signal) throws SignalException {
+        return performAction(signal, (a, b) -> a-b);
+    }
+
+    public Signal multiply(Signal signal) throws SignalException {
+        return performAction(signal, (a, b) -> a*b);
+    }
+
+    public Signal divide(Signal signal) throws SignalException {
+        return performAction(signal, (a, b) -> a/b);
     }
 }
