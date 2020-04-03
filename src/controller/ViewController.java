@@ -31,6 +31,7 @@ public class ViewController implements Initializable {
     @FXML private TextField fillFactorInput;
     @FXML private TextField jumpTimeInput;
     @FXML private TextField sampleNumberInput;
+    @FXML private TextField probabilityInput;
     @FXML private LineChart<Number, Number> lineChart;
     @FXML private BarChart<Number, Number> barChart;
     @FXML private ScatterChart<Number, Number> scatterChart;
@@ -93,6 +94,7 @@ public class ViewController implements Initializable {
                         "class model.signal.generator.TriangularSignalGenerator"));
                 HashSet<String> jumpTimeClassNames = new HashSet<>(Arrays.asList("class model.signal.generator.HeavisideStepGenerator"));
                 HashSet<String> sampleNumberForJumpClassNames = new HashSet<>(Arrays.asList("class model.signal.generator.UnitPulseGenerator"));
+                HashSet<String> probabilityClassNames = new HashSet<>(Arrays.asList("class model.signal.generator.PulseNoiseGenerator"));
                 boolean hideLineChart = false;
                 if (fillFactorClassNames.contains(generatorClassName)) {
                     signal = signalGenerator.generateWithFillFactor(Double.parseDouble(durationInput.getText()),
@@ -112,6 +114,13 @@ public class ViewController implements Initializable {
                             Double.parseDouble(amplitudeInput.getText()),
                             Double.parseDouble(frequencyInput.getText()),
                             Integer.parseInt(sampleNumberInput.getText()));
+                } else if (probabilityClassNames.contains(generatorClassName)) {
+                    hideLineChart = true;
+                    signal = signalGenerator.generateWithFillFactor(Double.parseDouble(durationInput.getText()),
+                            Double.parseDouble(startingTimeInput.getText()),
+                            Double.parseDouble(amplitudeInput.getText()),
+                            Double.parseDouble(frequencyInput.getText()),
+                            Double.parseDouble(probabilityInput.getText()));
                 } else {
                     signal = signalGenerator.generate(Double.parseDouble(durationInput.getText()),
                             Double.parseDouble(startingTimeInput.getText()),
@@ -283,6 +292,14 @@ public class ViewController implements Initializable {
                 }
             }
         });
+        probabilityInput.textProperty().addListener(new ChangeListener<String>() {
+            @Override
+            public void changed(ObservableValue<? extends String> observableValue, String oldValue, String newValue) {
+                if (!newValue.matches("[0]?(\\.\\d*)?|[1]")) {
+                    probabilityInput.setText(oldValue);
+                }
+            }
+        });
     }
 
     private void enableDisableGenerateBtn() {
@@ -294,7 +311,8 @@ public class ViewController implements Initializable {
                         frequencyInput.textProperty(),
                         fillFactorInput.textProperty(),
                         jumpTimeInput.textProperty(),
-                        sampleNumberInput.textProperty());
+                        sampleNumberInput.textProperty(),
+                        probabilityInput.textProperty());
             }
             @Override
             protected boolean computeValue() {
@@ -304,7 +322,8 @@ public class ViewController implements Initializable {
                         || (!frequencyInput.isDisabled() && frequencyInput.getText().isEmpty())
                         || (!fillFactorInput.isDisabled() && fillFactorInput.getText().isEmpty())
                         || (!jumpTimeInput.isDisabled() && jumpTimeInput.getText().isEmpty())
-                        || (!sampleNumberInput.isDisabled() && sampleNumberInput.getText().isEmpty()));
+                        || (!sampleNumberInput.isDisabled() && sampleNumberInput.getText().isEmpty())
+                        || (!probabilityInput.isDisabled() && probabilityInput.getText().isEmpty()));
             }
         };
         generateButton.disableProperty().bind(binding);
@@ -319,6 +338,7 @@ public class ViewController implements Initializable {
             ));
             String jumpTimeAllowedSignal = "S9: Skok jednostkowy";
             String sampleNumberAllowedSignal = "S10: Impuls jednostkowy";
+            String probabilityAllowedSignal = "S11: Szum impulsowy";
             if (factorAllowedSignals.contains(newValue)) {
                 fillFactorInput.setDisable(false);
             } else {
@@ -335,6 +355,11 @@ public class ViewController implements Initializable {
                 sampleNumberInput.setDisable(false);
             } else {
                 sampleNumberInput.setDisable(true);
+            }
+            if (probabilityAllowedSignal.equalsIgnoreCase(String.valueOf(newValue))) {
+                probabilityInput.setDisable(false);
+            } else {
+                probabilityInput.setDisable(true);
             }
         }));
     }

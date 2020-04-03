@@ -48,6 +48,9 @@ public class SignalGeneratorFactory {
             case SIGNAL_TYPE_S10_VALUE: {
                 return new UnitPulseGenerator();
             }
+            case SIGNAL_TYPE_S11_VALUE: {
+                return new PulseNoiseGenerator();
+            }
         }
         return null;
     }

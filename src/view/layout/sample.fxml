@@ -5,7 +5,7 @@
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
 
-<GridPane prefHeight="440.0" prefWidth="1000.0" xmlns="http://javafx.com/javafx/10.0.2-internal" xmlns:fx="http://javafx.com/fxml/1" fx:controller="controller.ViewController">
+<GridPane prefHeight="500.0" prefWidth="1000.0" xmlns="http://javafx.com/javafx/10.0.2-internal" xmlns:fx="http://javafx.com/fxml/1" fx:controller="controller.ViewController">
    <columnConstraints>
       <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" />
    </columnConstraints>
@@ -74,6 +74,8 @@
                               <RowConstraints minHeight="10.0" />
                               <RowConstraints minHeight="10.0" />
                               <RowConstraints minHeight="10.0" />
+                              <RowConstraints minHeight="10.0" />
+                              <RowConstraints minHeight="10.0" />
                               <RowConstraints minHeight="10.0" valignment="TOP" vgrow="ALWAYS" />
                            </rowConstraints>
                            <children>
@@ -86,7 +88,8 @@
                               <TextField fx:id="fillFactorInput" disable="true" promptText="Wpisz współczynnik k" GridPane.rowIndex="13" />
                               <TextField fx:id="jumpTimeInput" disable="true" promptText="Wpisz czas skoku [s]" GridPane.rowIndex="15" />
                               <TextField fx:id="sampleNumberInput" disable="true" promptText="Wpisz number próbki dla skoku aplitudy" GridPane.rowIndex="17" />
-                              <Button fx:id="generateButton" minWidth="-Infinity" mnemonicParsing="false" prefWidth="75.0" text="Generuj" GridPane.halignment="CENTER" GridPane.rowIndex="18">
+                              <TextField fx:id="probabilityInput" disable="true" promptText="Wpisz prawdopodobieństwo:" GridPane.rowIndex="19" />
+                              <Button fx:id="generateButton" minWidth="-Infinity" mnemonicParsing="false" prefWidth="75.0" text="Generuj" GridPane.halignment="CENTER" GridPane.rowIndex="20">
                                  <GridPane.margin>
                                     <Insets bottom="5.0" top="10.0" />
                                  </GridPane.margin>
@@ -100,6 +103,7 @@
                               <Label text="Współczynnik wypełnienia:" GridPane.rowIndex="12" />
                               <Label text="Czas skoku:" GridPane.rowIndex="14" />
                               <Label text="Numer próbki dla skoku:" GridPane.rowIndex="16" />
+                              <Label text="Prawdopodobieństwo:" GridPane.rowIndex="18" />
                            </children>
                         </GridPane>
                      </content>
