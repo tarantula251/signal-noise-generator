@@ -11,12 +11,14 @@ public class Signal implements Serializable {
     private double duration;
     private double amplitude;
     private double frequency;
+    private double period;
     private double fillFactor;
     private double average;
     private double absoluteAverage;
     private double averagePower;
     private double effectiveValue;
     private double variance;
+    private boolean continuous = true;
 
     @Override
     public String toString() {
@@ -24,6 +26,7 @@ public class Signal implements Serializable {
                 "\nduration=" + duration +
                 "\namplitude=" + amplitude +
                 "\nfrequency=" + frequency +
+                "\nperiod=" + period +
                 "\nfillFactor=" + fillFactor +
                 "\naverage=" + average +
                 "\nabsoluteAverage=" + absoluteAverage +
@@ -36,6 +39,7 @@ public class Signal implements Serializable {
     private void calculateAverage()
     {
         average = 0;
+        if(samples.isEmpty()) return;
         for(Sample sample : samples)
         {
             average += sample.value;
@@ -46,6 +50,7 @@ public class Signal implements Serializable {
     private void calculateAbsoluteAverage()
     {
         absoluteAverage = 0;
+        if(samples.isEmpty()) return;
         for(Sample sample : samples)
         {
             absoluteAverage += Math.abs(sample.value);
@@ -56,6 +61,7 @@ public class Signal implements Serializable {
     private void calculateAveragePower()
     {
         averagePower = 0;
+        if(samples.isEmpty()) return;
         for(Sample sample : samples)
         {
             averagePower += Math.pow(sample.value, 2);
@@ -71,6 +77,7 @@ public class Signal implements Serializable {
     private void calculateVariance()
     {
         variance = 0;
+        if(samples.isEmpty()) return;
         for(Sample sample : samples)
         {
             variance += Math.pow(sample.value - average, 2);
@@ -86,11 +93,21 @@ public class Signal implements Serializable {
         calculateSignalParameters();
     }
 
-    public Signal(ArrayList<Sample> samples, double duration, double amplitude, double frequency, double fillFactor) {
+    public Signal(ArrayList<Sample> samples, double duration, double amplitude, double frequency, double period) {
         this.samples = samples;
         this.duration = duration;
         this.amplitude = amplitude;
         this.frequency = frequency;
+        this.period = period;
+        calculateSignalParameters();
+    }
+
+    public Signal(ArrayList<Sample> samples, double duration, double amplitude, double frequency, double period, double fillFactor) {
+        this.samples = samples;
+        this.duration = duration;
+        this.amplitude = amplitude;
+        this.frequency = frequency;
+        this.period = period;
         this.fillFactor = fillFactor;
         calculateSignalParameters();
     }
@@ -100,13 +117,6 @@ public class Signal implements Serializable {
         this.duration = duration;
         this.amplitude = amplitude;
         calculateSignalParameters();
-    }
-
-    public Signal(ArrayList<Sample> samples, double duration, double amplitude, boolean isDiscreteSignal) {
-        this.samples = samples;
-        this.duration = duration;
-        this.amplitude = amplitude;
-        //TODO calculate parameters for a discrete signal
     }
 
     public String getName() {
@@ -133,9 +143,14 @@ public class Signal implements Serializable {
         return frequency;
     }
 
+    public double getPeriod() {
+        return period;
+    }
+
     public double getFillFactor() {
         return fillFactor;
     }
+
     public double getAverage() {
         return average;
     }
@@ -154,6 +169,14 @@ public class Signal implements Serializable {
 
     public double getVariance() {
         return variance;
+    }
+
+    public boolean isContinuous() {
+        return continuous;
+    }
+
+    public void setContinuous(boolean continuous) {
+        this.continuous = continuous;
     }
 
     private void calculateSignalParameters() {

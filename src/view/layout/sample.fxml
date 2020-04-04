@@ -19,7 +19,6 @@
         <menus>
           <Menu mnemonicParsing="false" text="Plik">
             <items>
-                  <MenuItem fx:id="exportMenuItem" mnemonicParsing="false" text="Eksportuj..." />
                   <MenuItem fx:id="importMenuItem" mnemonicParsing="false" text="Importuj..." />
                   <SeparatorMenuItem mnemonicParsing="false" />
               <MenuItem mnemonicParsing="false" text="Zamknij" />
@@ -90,6 +89,8 @@
                               <RowConstraints minHeight="10.0" />
                               <RowConstraints minHeight="10.0" />
                               <RowConstraints minHeight="10.0" />
+                              <RowConstraints minHeight="10.0" />
+                              <RowConstraints minHeight="10.0" />
                               <RowConstraints minHeight="10.0" valignment="TOP" vgrow="ALWAYS" />
                            </rowConstraints>
                            <children>
@@ -99,11 +100,12 @@
                               <TextField fx:id="startingTimeInput" promptText="Wpisz czas początkowy [s]" GridPane.rowIndex="5" />
                               <TextField fx:id="amplitudeInput" promptText="Wpisz amplitudę" GridPane.rowIndex="7" />
                               <TextField fx:id="frequencyInput" promptText="Wpisz częstotliwość [Hz]" GridPane.rowIndex="9" />
-                              <TextField fx:id="fillFactorInput" disable="true" promptText="Wpisz współczynnik k" GridPane.rowIndex="11" />
-                              <TextField fx:id="jumpTimeInput" disable="true" promptText="Wpisz czas skoku [s]" GridPane.rowIndex="13" />
-                              <TextField fx:id="sampleNumberInput" disable="true" promptText="Wpisz number próbki dla skoku aplitudy" GridPane.rowIndex="15" />
-                              <TextField fx:id="probabilityInput" disable="true" promptText="Wpisz prawdopodobieństwo:" GridPane.rowIndex="17" />
-                              <Button fx:id="generateButton" minWidth="-Infinity" mnemonicParsing="false" prefWidth="75.0" text="Generuj" GridPane.halignment="CENTER" GridPane.rowIndex="18">
+                              <TextField fx:id="periodInput" disable="true" promptText="Wpisz okres sygnału [s]" GridPane.rowIndex="11" />
+                              <TextField fx:id="fillFactorInput" disable="true" promptText="Wpisz współczynnik k" GridPane.rowIndex="13" />
+                              <TextField fx:id="jumpTimeInput" disable="true" promptText="Wpisz czas skoku [s]" GridPane.rowIndex="15" />
+                              <TextField fx:id="sampleNumberInput" disable="true" promptText="Wpisz number próbki dla skoku aplitudy" GridPane.rowIndex="17" />
+                              <TextField fx:id="probabilityInput" disable="true" promptText="Wpisz prawdopodobieństwo:" GridPane.rowIndex="19" />
+                              <Button fx:id="generateButton" minWidth="-Infinity" mnemonicParsing="false" prefWidth="75.0" text="Generuj" GridPane.halignment="CENTER" GridPane.rowIndex="20">
                                  <GridPane.margin>
                                     <Insets bottom="5.0" top="10.0" />
                                  </GridPane.margin>
@@ -112,10 +114,11 @@
                               <Label text="Czas początkowy:" GridPane.rowIndex="4" />
                               <Label text="Amplituda:" GridPane.rowIndex="6" />
                               <Label text="Częstotliwość:" GridPane.rowIndex="8" />
-                              <Label text="Współczynnik wypełnienia:" GridPane.rowIndex="10" />
-                              <Label text="Czas skoku:" GridPane.rowIndex="12" />
-                              <Label text="Numer próbki dla skoku:" GridPane.rowIndex="14" />
-                              <Label text="Prawdopodobieństwo:" GridPane.rowIndex="16" />
+                              <Label text="Okres sygnału:" GridPane.rowIndex="10" />
+                              <Label text="Współczynnik wypełnienia:" GridPane.rowIndex="12" />
+                              <Label text="Czas skoku:" GridPane.rowIndex="14" />
+                              <Label text="Numer próbki dla skoku:" GridPane.rowIndex="16" />
+                              <Label text="Prawdopodobieństwo:" GridPane.rowIndex="18" />
                            </children>
                         </GridPane>
                      </content>

@@ -9,7 +9,7 @@ import java.util.Random;
 public class PulseNoiseGenerator implements SignalGenerator {
 
     @Override
-    public Signal generateWithFillFactor(Double duration, Double beginTime, Double amplitude, Double frequency, Double probability) {
+    public Signal generate(Double duration, Double beginTime, Double amplitude, Double frequency, Double period, Double fillFactor, Double jumpTime, Integer sampleNumber, Double probability) {
         ArrayList<Sample> samples = new ArrayList<>();
         int samplesCount = (int)(duration * frequency);
         double samplesDistance = duration / samplesCount;
@@ -22,21 +22,8 @@ public class PulseNoiseGenerator implements SignalGenerator {
                 samples.add(new Sample(time, amplitude));
             } else samples.add(new Sample(time, 0));
         }
-        return new Signal(samples, duration, amplitude,true);
-    }
-
-    @Override
-    public Signal generateWithJumpTime(Double duration, Double beginTime, Double amplitude, Double jumpTime) {
-        return null;
-    }
-
-    @Override
-    public Signal generateWithSampleNrForJump(Double duration, Double beginTime, Double amplitude, Double frequency, Integer sampleNumber) {
-        return null;
-    }
-
-    @Override
-    public Signal generate(Double duration, Double beginTime, Double amplitude, Double frequency) {
-        return null;
+        Signal result = new Signal(samples, duration, amplitude, frequency);
+        result.setContinuous(false);
+        return result;
     }
 }

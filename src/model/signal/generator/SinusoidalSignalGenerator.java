@@ -6,12 +6,10 @@ import model.signal.Signal;
 import java.util.ArrayList;
 
 public class SinusoidalSignalGenerator implements SignalGenerator {
-    private static final int SAMPLES_PER_PERIOD = 48;
     @Override
-    public Signal generate(Double duration, Double beginTime, Double amplitude, Double frequency) {
+    public Signal generate(Double duration, Double beginTime, Double amplitude, Double frequency, Double period, Double fillFactor, Double jumpTime, Integer sampleNumber, Double probability) {
         ArrayList<Sample> samples = new ArrayList<>();
-        double period = 1 / frequency;
-        int samplesCount = (int)(duration / (period / SAMPLES_PER_PERIOD));
+        int samplesCount = (int)(duration * frequency);
         double samplesDistance = duration / samplesCount;
 
         for(int i = 0; i <= samplesCount; ++i)
@@ -19,20 +17,5 @@ public class SinusoidalSignalGenerator implements SignalGenerator {
             samples.add(new Sample(beginTime + (i * samplesDistance), amplitude * Math.sin(2 * Math.PI * (i * samplesDistance) / period)));
         }
         return new Signal(samples, duration, amplitude, frequency);
-    }
-
-    @Override
-    public Signal generateWithFillFactor(Double duration, Double beginTime, Double amplitude, Double frequency, Double fillFactor) {
-        return null;
-    }
-
-    @Override
-    public Signal generateWithJumpTime(Double duration, Double beginTime, Double amplitude, Double jumpTime) {
-        return null;
-    }
-
-    @Override
-    public Signal generateWithSampleNrForJump(Double duration, Double beginTime, Double amplitude, Double frequency, Integer sampleNumber) {
-        return null;
     }
 }

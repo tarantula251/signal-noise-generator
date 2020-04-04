@@ -11,7 +11,6 @@ import javafx.fxml.Initializable;
 import javafx.scene.chart.*;
 import javafx.scene.control.*;
 import javafx.scene.input.MouseButton;
-import javafx.scene.input.MouseEvent;
 import javafx.stage.FileChooser;
 import model.signal.Sample;
 import model.signal.Signal;
@@ -32,6 +31,7 @@ public class ViewController implements Initializable {
     @FXML private TextField startingTimeInput;
     @FXML private TextField amplitudeInput;
     @FXML private TextField frequencyInput;
+    @FXML private TextField periodInput;
     @FXML private TextField fillFactorInput;
     @FXML private TextField jumpTimeInput;
     @FXML private TextField sampleNumberInput;
@@ -48,7 +48,6 @@ public class ViewController implements Initializable {
     @FXML private Label effectiveValueLabel;
     @FXML private Label varianceLabel;
     @FXML private MenuBar menuBar;
-    @FXML private MenuItem exportMenuItem;
     @FXML private MenuItem importMenuItem;
     @FXML private ListView<String> signalsListView;
     private ArrayList<Signal> loadedSignals = new ArrayList<>();
@@ -70,7 +69,6 @@ public class ViewController implements Initializable {
         lineChart.setTitle("Krzywa sygnału");
         lineChart.getXAxis().setLabel("Czas");
         lineChart.getYAxis().setLabel("Wartość");
-        lineChart.setCreateSymbols(false);
         lineChart.setOnMouseClicked(event -> {
             if (MouseButton.SECONDARY.equals(event.getButton())
             && !lineChart.getData().isEmpty() && !barChart.getData().isEmpty()) {
@@ -113,82 +111,39 @@ public class ViewController implements Initializable {
             public void handle(ActionEvent mouseEvent) {
                 SignalGenerator signalGenerator = SignalGeneratorFactory.getSignalGenerator((String) signalTypeComboBox.getValue());
                 if(signalGenerator == null) return;
-                String generatorClassName = String.valueOf(signalGenerator.getClass());
-                Signal signal;
-                HashSet<String> fillFactorClassNames = new HashSet<>(Arrays.asList("class model.signal.generator.RectangularSignalGenerator",
-                        "class model.signal.generator.RectangularSymmetricSignalGenerator",
-                        "class model.signal.generator.TriangularSignalGenerator"));
-                HashSet<String> jumpTimeClassNames = new HashSet<>(Arrays.asList("class model.signal.generator.HeavisideStepGenerator"));
-                HashSet<String> sampleNumberForJumpClassNames = new HashSet<>(Arrays.asList("class model.signal.generator.UnitPulseGenerator"));
-                HashSet<String> probabilityClassNames = new HashSet<>(Arrays.asList("class model.signal.generator.PulseNoiseGenerator"));
-                boolean hideLineChart = false;
-                if (fillFactorClassNames.contains(generatorClassName)) {
-                    signal = signalGenerator.generateWithFillFactor(Double.parseDouble(durationInput.getText()),
-                            Double.parseDouble(startingTimeInput.getText()),
-                            Double.parseDouble(amplitudeInput.getText()),
-                            Double.parseDouble(frequencyInput.getText()),
-                            Double.parseDouble(fillFactorInput.getText()));
-                } else if (jumpTimeClassNames.contains(generatorClassName)) {
-                    signal = signalGenerator.generateWithJumpTime(Double.parseDouble(durationInput.getText()),
-                            Double.parseDouble(startingTimeInput.getText()),
-                            Double.parseDouble(amplitudeInput.getText()),
-                            Double.parseDouble(jumpTimeInput.getText()));
-                } else if (sampleNumberForJumpClassNames.contains(generatorClassName)) {
-                    hideLineChart = true;
-                    signal = signalGenerator.generateWithSampleNrForJump(Double.parseDouble(durationInput.getText()),
-                            Double.parseDouble(startingTimeInput.getText()),
-                            Double.parseDouble(amplitudeInput.getText()),
-                            Double.parseDouble(frequencyInput.getText()),
-                            Integer.parseInt(sampleNumberInput.getText()));
-                } else if (probabilityClassNames.contains(generatorClassName)) {
-                    hideLineChart = true;
-                    signal = signalGenerator.generateWithFillFactor(Double.parseDouble(durationInput.getText()),
-                            Double.parseDouble(startingTimeInput.getText()),
-                            Double.parseDouble(amplitudeInput.getText()),
-                            Double.parseDouble(frequencyInput.getText()),
-                            Double.parseDouble(probabilityInput.getText()));
-                } else {
-                    signal = signalGenerator.generate(Double.parseDouble(durationInput.getText()),
-                            Double.parseDouble(startingTimeInput.getText()),
-                            Double.parseDouble(amplitudeInput.getText()),
-                            Double.parseDouble(frequencyInput.getText()));
-                }
+
+                double duration = durationInput.getText().isEmpty() ? 0 : Double.parseDouble(durationInput.getText());
+                double startingTime = startingTimeInput.getText().isEmpty() ? 0 : Double.parseDouble(startingTimeInput.getText());
+                double amplitude = amplitudeInput.getText().isEmpty() ? 0 : Double.parseDouble(amplitudeInput.getText());
+                double frequency = frequencyInput.getText().isEmpty() ? 0 : Double.parseDouble(frequencyInput.getText());
+                double period = periodInput.getText().isEmpty() ? 0 : Double.parseDouble(periodInput.getText());
+                double fillFactor = fillFactorInput.getText().isEmpty() ? 0 : Double.parseDouble(fillFactorInput.getText());
+                double jumpTime = jumpTimeInput.getText().isEmpty() ? 0 : Double.parseDouble(jumpTimeInput.getText());
+                int sampleNumber = sampleNumberInput.getText().isEmpty() ? 0 : Integer.parseInt(sampleNumberInput.getText());
+                double probability = probabilityInput.getText().isEmpty() ? 0 : Double.parseDouble(probabilityInput.getText());
+
+                Signal signal = signalGenerator.generate(
+                        duration,
+                        startingTime,
+                        amplitude,
+                        frequency,
+                        period,
+                        fillFactor,
+                        jumpTime,
+                        sampleNumber,
+                        probability
+                );
+
+                if(signal == null) return;
+
                 signal.setName("Signal " + LocalDateTime.now().toString().replace('.', '_').replace(':', '_'));
 
-                loadedSignals.clear();
                 loadedSignals.add(signal);
+                refreshSignalsListView();
 
-                if (!hideLineChart) {
-                    if (scatterChart.isVisible()) scatterChart.setVisible(false);
-                    if (!lineChart.isVisible()) lineChart.setVisible(true);
-                    lineChart.getData().clear();
-                    drawSignalCurve(signal);
-                } else {
-                    if (lineChart.isVisible()) lineChart.setVisible(false);
-                    if (!scatterChart.isVisible()) scatterChart.setVisible(true);
-                    scatterChart.setTitle("Próbki sygnału");
-                    scatterChart.getXAxis().setLabel("Czas");
-                    scatterChart.getYAxis().setLabel("Wartość");
-                    scatterChart.getData().clear();
-                    drawSignalPoints(signal);
-                }
-
-                barChart.getData().clear();
+                drawSignalCurve(signal);
                 drawHistogram(signal);
                 displaySignalParameters(signal);
-            }
-        };
-
-        EventHandler<ActionEvent> exportMenuItemActionEventEventHandler = new EventHandler<ActionEvent>() {
-            @Override
-            public void handle(ActionEvent actionEvent) {
-                if(loadedSignals.size() == 0) return;
-                try {
-                    exportSignal(loadedSignals.get(0));
-                } catch (IOException e) {
-                    e.printStackTrace();
-                    System.err.println(e.getMessage());
-                }
             }
         };
 
@@ -206,7 +161,6 @@ public class ViewController implements Initializable {
         };
 
         generateButton.setOnAction(generateButtonActionEventEventHandler);
-        exportMenuItem.setOnAction(exportMenuItemActionEventEventHandler);
         importMenuItem.setOnAction(importMenuItemActionEventEventHandler);
 
         signalsListView.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
@@ -249,6 +203,17 @@ public class ViewController implements Initializable {
                         result.ifPresent(name -> {
                             for(Signal signal : loadedSignals)
                             {
+                                if(signal.getName().equals(name))
+                                {
+                                    ArrayList<String> duplicatedNames = new ArrayList<>();
+                                    duplicatedNames.add(name);
+                                    showDuplicateNamesAlert(duplicatedNames);
+                                    return;
+                                };
+                            }
+
+                            for(Signal signal : loadedSignals)
+                            {
                                 if(signal.getName().equals(cell.getItem()))
                                 {
                                     signal.setName(name);
@@ -271,6 +236,27 @@ public class ViewController implements Initializable {
                             }
                         }
                     });
+
+                    MenuItem exportItem = new MenuItem();
+                    exportItem.textProperty().bind(Bindings.format("Eksportuj \"%s\"", cell.itemProperty()));
+                    exportItem.setOnAction(event -> {
+                        for(Signal signal : loadedSignals)
+                        {
+                            if(signal.getName().equals(cell.getItem()))
+                            {
+                                try {
+                                    exportSignal(signal);
+                                } catch (IOException e) {
+                                    Alert ioExceptionAlert = new Alert(Alert.AlertType.ERROR);
+                                    ioExceptionAlert.setTitle("Błąd podczas zapisu do pliku");
+                                    ioExceptionAlert.setHeaderText(null);
+                                    ioExceptionAlert.setContentText(e.getMessage());
+                                }
+                                break;
+                            }
+                        }
+                    });
+
 
                     contextMenu.getItems().add(addToChartItem);
 
@@ -381,6 +367,7 @@ public class ViewController implements Initializable {
 
                     contextMenu.getItems().addAll(
                             new SeparatorMenuItem(),
+                            exportItem,
                             editItem,
                             deleteItem);
 
@@ -406,11 +393,15 @@ public class ViewController implements Initializable {
         if(signal == null) return;
         if (lineChart.isVisible()) {
             lineChart.getData().add(new XYChart.Series<Number, Number>());
-            XYChart.Series series = lineChart.getData().get(lineChart.getData().size() - 1);
+            XYChart.Series<Number, Number> series = lineChart.getData().get(lineChart.getData().size() - 1);
+
+            if(!signal.isContinuous()) series.nodeProperty().get().setStyle("-fx-stroke: transparent;");
             series.setName(signal.getName());
+
             for(Sample sample : signal.getSamples())
             {
                 series.getData().add(new XYChart.Data<Number, Number>(sample.time, sample.value));
+                if(signal.isContinuous()) series.getData().get(series.getData().size() - 1).getNode().lookup(".chart-line-symbol").setStyle("-fx-background-color: transparent");
             }
         }
     }
@@ -420,7 +411,7 @@ public class ViewController implements Initializable {
         if(signal == null) return;
         if (scatterChart.isVisible()) {
             scatterChart.getData().add(new XYChart.Series<Number, Number>());
-            XYChart.Series series = scatterChart.getData().get(scatterChart.getData().size() - 1);
+            XYChart.Series<Number, Number> series = scatterChart.getData().get(scatterChart.getData().size() - 1);
             series.setName(signal.getName());
             double minTime = signal.getSamples().get(0).time;
             double maxTime = signal.getSamples().get(signal.getSamples().size() - 1).time;
@@ -543,32 +534,43 @@ public class ViewController implements Initializable {
 
     private void enableDisableTextInputs() {
         signalTypeComboBox.valueProperty().addListener(((observableValue, oldValue, newValue) -> {
-            ArrayList<String> factorAllowedSignals = new ArrayList<>(Arrays.asList(
-                    "S6: Sygnał prostokątny",
-                    "S7: Sygnał prostokątny symetryczny",
-                    "S8: Sygnał trójkątny"
+            ArrayList<String> periodAllowedSignals = new ArrayList<>(Arrays.asList(
+                    SignalGeneratorFactory.SIGNAL_TYPE_S3_VALUE,
+                    SignalGeneratorFactory.SIGNAL_TYPE_S4_VALUE,
+                    SignalGeneratorFactory.SIGNAL_TYPE_S5_VALUE,
+                    SignalGeneratorFactory.SIGNAL_TYPE_S6_VALUE,
+                    SignalGeneratorFactory.SIGNAL_TYPE_S7_VALUE,
+                    SignalGeneratorFactory.SIGNAL_TYPE_S8_VALUE
             ));
-            String jumpTimeAllowedSignal = "S9: Skok jednostkowy";
-            String sampleNumberAllowedSignal = "S10: Impuls jednostkowy";
-            String probabilityAllowedSignal = "S11: Szum impulsowy";
+            ArrayList<String> factorAllowedSignals = new ArrayList<>(Arrays.asList(
+                    SignalGeneratorFactory.SIGNAL_TYPE_S6_VALUE,
+                    SignalGeneratorFactory.SIGNAL_TYPE_S7_VALUE,
+                    SignalGeneratorFactory.SIGNAL_TYPE_S8_VALUE
+            ));
+
+            if(periodAllowedSignals.contains(newValue)) {
+                periodInput.setDisable(false);
+            } else {
+                periodInput.setDisable(true);
+            }
             if (factorAllowedSignals.contains(newValue)) {
                 fillFactorInput.setDisable(false);
             } else {
                 fillFactorInput.setDisable(true);
             }
-            if (jumpTimeAllowedSignal.equalsIgnoreCase(String.valueOf(newValue))) {
+            if (SignalGeneratorFactory.SIGNAL_TYPE_S9_VALUE.equalsIgnoreCase(String.valueOf(newValue))) {
                 jumpTimeInput.setDisable(false);
                 frequencyInput.setDisable(true);
             } else {
                 frequencyInput.setDisable(false);
                 jumpTimeInput.setDisable(true);
             }
-            if (sampleNumberAllowedSignal.equalsIgnoreCase(String.valueOf(newValue))) {
+            if (SignalGeneratorFactory.SIGNAL_TYPE_S10_VALUE.equalsIgnoreCase(String.valueOf(newValue))) {
                 sampleNumberInput.setDisable(false);
             } else {
                 sampleNumberInput.setDisable(true);
             }
-            if (probabilityAllowedSignal.equalsIgnoreCase(String.valueOf(newValue))) {
+            if (SignalGeneratorFactory.SIGNAL_TYPE_S11_VALUE.equalsIgnoreCase(String.valueOf(newValue))) {
                 probabilityInput.setDisable(false);
             } else {
                 probabilityInput.setDisable(true);
@@ -591,7 +593,6 @@ public class ViewController implements Initializable {
         if(!file.createNewFile()) System.out.println("File already exist. Overriding.");
 
         String fileType = exportSignalFileChooser.getSelectedExtensionFilter().getDescription();
-        signal.setName(file.getName().split("\\.")[0]);
 
         if(fileType.equals("Signal file"))
         {
@@ -614,6 +615,9 @@ public class ViewController implements Initializable {
         exportSignalFileChooser.getExtensionFilters().add(sigExtensionFilter);
 
         List<File> files = exportSignalFileChooser.showOpenMultipleDialog(menuBar.getScene().getWindow());
+        ArrayList<String> duplicatedSignalsNames = new ArrayList<>();
+
+        if(files == null) return new ArrayList<>();
 
         for(File file : files)
         {
@@ -622,14 +626,41 @@ public class ViewController implements Initializable {
             ObjectInputStream objectInputStream = new ObjectInputStream(new FileInputStream(file));
 
             try {
-                Signal signal = (Signal)objectInputStream.readObject();
-                importedSignals.add(signal);
+                Signal signal = null;
+
+                try
+                {
+                    signal = (Signal)objectInputStream.readObject();
+                }
+                catch (InvalidClassException e)
+                {
+                    Alert invalidClassExceptionAlert = new Alert(Alert.AlertType.ERROR);
+                    invalidClassExceptionAlert.setTitle("Błąd importowania");
+                    invalidClassExceptionAlert.setHeaderText(null);
+                    invalidClassExceptionAlert.setContentText("Format jednego z wybranych plików jest nieprawidłowy. Importowanie przerwane.\nSzczegóły:\n" + file.getName());
+                    invalidClassExceptionAlert.showAndWait();
+                    return new ArrayList<>();
+                }
+
+                boolean isDuplicated = false;
+                for(Signal loadedSignal : loadedSignals)
+                {
+                    if(loadedSignal.getName().equals(signal.getName()))
+                    {
+                        duplicatedSignalsNames.add(signal.getName());
+                        isDuplicated = true;
+                        break;
+                    }
+                }
+                if(!isDuplicated) importedSignals.add(signal);
             } catch (ClassNotFoundException e) {
                 System.err.println(e.getMessage());
             }
 
             objectInputStream.close();
         }
+
+        if(!duplicatedSignalsNames.isEmpty()) showDuplicateNamesAlert(duplicatedSignalsNames);
 
         return importedSignals;
     }
@@ -666,6 +697,7 @@ public class ViewController implements Initializable {
                 if (signal.getName().equals(signalName)) {
                     drawSignalCurve(signal);
                     drawHistogram(signal);
+                    displaySignalParameters(signal);
                     break;
                 }
             }
@@ -694,6 +726,21 @@ public class ViewController implements Initializable {
         Alert incompatibleSignalsAlert = new Alert(Alert.AlertType.ERROR);
         incompatibleSignalsAlert.setTitle("Sygnały niekompatybilne");
         incompatibleSignalsAlert.setContentText("Zaznaczone sygnały są ze sobą niekompatybilne.");
+        incompatibleSignalsAlert.setHeaderText(null);
+        incompatibleSignalsAlert.showAndWait();
+    }
+
+    void showDuplicateNamesAlert(List<String> duplicatedNames)
+    {
+        String duplicatedNamesString = "";
+        for(String duplicate : duplicatedNames)
+        {
+            duplicatedNamesString += "\n- ";
+            duplicatedNamesString += duplicate;
+        }
+        Alert incompatibleSignalsAlert = new Alert(Alert.AlertType.WARNING);
+        incompatibleSignalsAlert.setTitle("Duplikaty");
+        incompatibleSignalsAlert.setContentText("Jeden lub więcej sygnałów o takiej samej nazwie już istnieją.\nZduplikowane sygnały:" + duplicatedNamesString);
         incompatibleSignalsAlert.setHeaderText(null);
         incompatibleSignalsAlert.showAndWait();
     }
