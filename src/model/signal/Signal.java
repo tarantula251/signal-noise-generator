@@ -177,7 +177,8 @@ public class Signal implements Serializable {
         {
             Sample leftSample = samples.get(sampleIndex);
             Sample rightSample = signal.getSamples().get(sampleIndex);
-            resultSamples.add(new Sample(leftSample.time, operator.applyAsDouble(leftSample.value, rightSample.value)));
+            Sample resultSample = new Sample(leftSample.time, operator.applyAsDouble(leftSample.value, rightSample.value));
+            if(Double.isFinite(resultSample.value)) resultSamples.add(resultSample);
         }
 
         return new Signal(resultSamples, duration, amplitude, frequency, fillFactor);

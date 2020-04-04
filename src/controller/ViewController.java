@@ -1,5 +1,6 @@
 package controller;
 
+import javafx.beans.binding.Bindings;
 import javafx.beans.binding.BooleanBinding;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
@@ -9,9 +10,12 @@ import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.chart.*;
 import javafx.scene.control.*;
+import javafx.scene.input.MouseButton;
+import javafx.scene.input.MouseEvent;
 import javafx.stage.FileChooser;
 import model.signal.Sample;
 import model.signal.Signal;
+import model.signal.SignalException;
 import model.signal.generator.SignalGenerator;
 import model.signal.generator.SignalGeneratorFactory;
 
@@ -46,6 +50,7 @@ public class ViewController implements Initializable {
     @FXML private MenuBar menuBar;
     @FXML private MenuItem exportMenuItem;
     @FXML private MenuItem importMenuItem;
+    @FXML private ListView<String> signalsListView;
     private ArrayList<Signal> loadedSignals = new ArrayList<>();
 
     private static DecimalFormat decimalFormat = new DecimalFormat("#.##");
@@ -53,28 +58,49 @@ public class ViewController implements Initializable {
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
 
+        final ContextMenu chartContextMenu = new ContextMenu();
+        MenuItem clearChartsMenuItem = new MenuItem();
+        clearChartsMenuItem.textProperty().bind(Bindings.format("Wyczyść wykres"));
+        clearChartsMenuItem.setOnAction(actionEvent -> {
+            lineChart.getData().clear();
+            barChart.getData().clear();
+        });
+        chartContextMenu.getItems().add(clearChartsMenuItem);
+
         lineChart.setTitle("Krzywa sygnału");
         lineChart.getXAxis().setLabel("Czas");
         lineChart.getYAxis().setLabel("Wartość");
         lineChart.setCreateSymbols(false);
+        lineChart.setOnMouseClicked(event -> {
+            if (MouseButton.SECONDARY.equals(event.getButton())
+            && !lineChart.getData().isEmpty() && !barChart.getData().isEmpty()) {
+                chartContextMenu.show(lineChart.getScene().getWindow(), event.getScreenX(), event.getScreenY());
+            }
+        });
 
         barChart.setTitle("Rozkład wartości próbek");
         barChart.getXAxis().setLabel("Wartość");
         barChart.getYAxis().setLabel("Ilość próbek");
+        barChart.setOnMouseClicked(event -> {
+            if (MouseButton.SECONDARY.equals(event.getButton())
+                    && !lineChart.getData().isEmpty() && !barChart.getData().isEmpty()) {
+                chartContextMenu.show(lineChart.getScene().getWindow(), event.getScreenX(), event.getScreenY());
+            }
+        });
 
         // populate data in combobox
         signalTypeComboBox.getItems().addAll(
-                "S1: Szum o rozkładzie jednostajnym",
-                "S2: Szum gaussowski",
-                "S3: Sygnał sinusoidalny",
-                "S4: Sygnał sinusoidalny wyprostowany jednopołówkowo",
-                "S5: Sygnał sinusoidalny wyprostowany dwupołówkowo",
-                "S6: Sygnał prostokątny",
-                "S7: Sygnał prostokątny symetryczny",
-                "S8: Sygnał trójkątny",
-                "S9: Skok jednostkowy",
-                "S10: Impuls jednostkowy",
-                "S11: Szum impulsowy"
+                SignalGeneratorFactory.SIGNAL_TYPE_S1_VALUE,
+                SignalGeneratorFactory.SIGNAL_TYPE_S2_VALUE,
+                SignalGeneratorFactory.SIGNAL_TYPE_S3_VALUE,
+                SignalGeneratorFactory.SIGNAL_TYPE_S4_VALUE,
+                SignalGeneratorFactory.SIGNAL_TYPE_S5_VALUE,
+                SignalGeneratorFactory.SIGNAL_TYPE_S6_VALUE,
+                SignalGeneratorFactory.SIGNAL_TYPE_S7_VALUE,
+                SignalGeneratorFactory.SIGNAL_TYPE_S8_VALUE,
+                SignalGeneratorFactory.SIGNAL_TYPE_S9_VALUE,
+                SignalGeneratorFactory.SIGNAL_TYPE_S10_VALUE,
+                SignalGeneratorFactory.SIGNAL_TYPE_S11_VALUE
         );
         signalTypeComboBox.getSelectionModel().selectFirst();
         signalTypeComboBox.setVisibleRowCount(11);
@@ -149,7 +175,6 @@ public class ViewController implements Initializable {
 
                 barChart.getData().clear();
                 drawHistogram(signal);
-
                 displaySignalParameters(signal);
             }
         };
@@ -171,12 +196,8 @@ public class ViewController implements Initializable {
             @Override
             public void handle(ActionEvent actionEvent) {
                 try {
-                    loadedSignals = importSignals();
-                    for(Signal signal : loadedSignals)
-                    {
-                        drawSignalCurve(signal);
-                        drawHistogram(signal);
-                    }
+                    loadedSignals.addAll(importSignals());
+                    refreshSignalsListView();
                 } catch (IOException e) {
                     e.printStackTrace();
                     System.err.println(e.getMessage());
@@ -187,6 +208,197 @@ public class ViewController implements Initializable {
         generateButton.setOnAction(generateButtonActionEventEventHandler);
         exportMenuItem.setOnAction(exportMenuItemActionEventEventHandler);
         importMenuItem.setOnAction(importMenuItemActionEventEventHandler);
+
+        signalsListView.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
+        signalsListView.setCellFactory(lv -> {
+
+            ListCell<String> cell = new ListCell<>();
+
+            cell.textProperty().bind(cell.itemProperty());
+
+            cell.setOnMouseClicked(mouseEvent ->
+            {
+
+                if(mouseEvent.getButton().equals(MouseButton.PRIMARY) && mouseEvent.getClickCount() == 2)
+                {
+                    addRemoveSignalChart(cell.getItem());
+                }
+                else if(mouseEvent.getButton().equals(MouseButton.SECONDARY))
+                {
+                    ContextMenu contextMenu = new ContextMenu();
+                    MenuItem addToChartItem = new MenuItem();
+
+                    addToChartItem.textProperty().bind(Bindings.format("Dodaj/Usuń z wyrkesu"));
+                    addToChartItem.setOnAction(event -> {
+                        addRemoveSignalChart(cell.getItem());
+                    });
+
+
+
+                    MenuItem editItem = new MenuItem();
+                    editItem.textProperty().bind(Bindings.format("Zmień nazwę..."));
+                    editItem.setOnAction(event -> {
+                        String item = cell.getItem();
+                        TextInputDialog dialog = new TextInputDialog(item);
+                        dialog.setTitle("Nowa nazwa");
+                        dialog.setHeaderText(null);
+                        dialog.setGraphic(null);
+
+                        Optional<String> result = dialog.showAndWait();
+
+                        result.ifPresent(name -> {
+                            for(Signal signal : loadedSignals)
+                            {
+                                if(signal.getName().equals(cell.getItem()))
+                                {
+                                    signal.setName(name);
+                                    refreshSignalsListView();
+                                    break;
+                                }
+                            }
+                        });
+                    });
+                    MenuItem deleteItem = new MenuItem();
+                    deleteItem.textProperty().bind(Bindings.format("Usuń \"%s\"", cell.itemProperty()));
+                    deleteItem.setOnAction(event -> {
+                        for(Signal signal : loadedSignals)
+                        {
+                            if(signal.getName().equals(cell.getItem()))
+                            {
+                                loadedSignals.remove(signal);
+                                signalsListView.getItems().remove(cell.getItem());
+                                break;
+                            }
+                        }
+                    });
+
+                    contextMenu.getItems().add(addToChartItem);
+
+                    if(signalsListView.getSelectionModel().getSelectedItems().size() > 1)
+                    {
+                        Menu performActionOnSelectedMenu = new Menu("Działania na zaznaczonych...");
+                        MenuItem sumSelectedMenuItem = new MenuItem("Dodaj");
+                        sumSelectedMenuItem.setOnAction(actionEvent ->
+                        {
+                            ArrayList<Signal> signals = getSelectedSignals();
+                            if(signals.isEmpty()) return;
+
+                            Signal resultSignal = signals.get(0);
+                            for(int signalIndex = 1; signalIndex < signals.size(); ++signalIndex)
+                            {
+                                try {
+                                    resultSignal = resultSignal.add(signals.get(signalIndex));
+                                } catch (SignalException e) {
+                                    showIncompatibleSignalsAlert();
+                                    return;
+                                }
+                            }
+
+                            resultSignal.setName("Sum of selected " + LocalDateTime.now().toString().replace('.', '_').replace(':', '_'));
+
+                            loadedSignals.add(resultSignal);
+                            refreshSignalsListView();
+                        });
+
+                        MenuItem subtractSelectedMenuItem = new MenuItem("Odejmij");
+                        subtractSelectedMenuItem.setOnAction(actionEvent ->
+                        {
+                            ArrayList<Signal> signals = getSelectedSignals();
+                            if(signals.isEmpty()) return;
+
+                            Signal resultSignal = signals.get(0);
+                            for(int signalIndex = 1; signalIndex < signals.size(); ++signalIndex)
+                            {
+                                try {
+                                    resultSignal = resultSignal.subtract(signals.get(signalIndex));
+                                } catch (SignalException e) {
+                                    showIncompatibleSignalsAlert();
+                                    return;
+                                }
+                            }
+
+                            resultSignal.setName("Difference of selected " + LocalDateTime.now().toString().replace('.', '_').replace(':', '_'));
+
+                            loadedSignals.add(resultSignal);
+                            refreshSignalsListView();
+                        });
+
+                        MenuItem multiplySelectedMenuItem = new MenuItem("Pomnóż");
+                        multiplySelectedMenuItem.setOnAction(actionEvent ->
+                        {
+                            ArrayList<Signal> signals = getSelectedSignals();
+                            if(signals.isEmpty()) return;
+
+                            Signal resultSignal = signals.get(0);
+                            for(int signalIndex = 1; signalIndex < signals.size(); ++signalIndex)
+                            {
+                                try {
+                                    resultSignal = resultSignal.multiply(signals.get(signalIndex));
+                                } catch (SignalException e) {
+                                    showIncompatibleSignalsAlert();
+                                    return;
+                                }
+                            }
+
+                            resultSignal.setName("Product of selected " + LocalDateTime.now().toString().replace('.', '_').replace(':', '_'));
+
+                            loadedSignals.add(resultSignal);
+                            refreshSignalsListView();
+                        });
+
+                        MenuItem divideSelectedMenuItem = new MenuItem("Podziel");
+                        divideSelectedMenuItem.setOnAction(actionEvent ->
+                        {
+                            ArrayList<Signal> signals = getSelectedSignals();
+                            if(signals.isEmpty()) return;
+
+                            Signal resultSignal = signals.get(0);
+                            for(int signalIndex = 1; signalIndex < signals.size(); ++signalIndex)
+                            {
+                                try {
+                                    resultSignal = resultSignal.divide(signals.get(signalIndex));
+                                } catch (SignalException e) {
+                                    showIncompatibleSignalsAlert();
+                                    return;
+                                }
+                            }
+
+                            resultSignal.setName("Quotient of selected " + LocalDateTime.now().toString().replace('.', '_').replace(':', '_'));
+
+                            loadedSignals.add(resultSignal);
+                            refreshSignalsListView();
+                        });
+
+                        performActionOnSelectedMenu.getItems().addAll(
+                                sumSelectedMenuItem,
+                                subtractSelectedMenuItem,
+                                multiplySelectedMenuItem,
+                                divideSelectedMenuItem
+                        );
+
+                        contextMenu.getItems().add(performActionOnSelectedMenu);
+                    }
+
+                    contextMenu.getItems().addAll(
+                            new SeparatorMenuItem(),
+                            editItem,
+                            deleteItem);
+
+
+
+                    contextMenu.show(signalsListView.getScene().getWindow(), mouseEvent.getScreenX(), mouseEvent.getScreenY());
+                }
+            });
+
+            return cell ;
+        });
+
+    }
+
+    private void refreshSignalsListView()
+    {
+        signalsListView.getItems().clear();
+        for(Signal signal : loadedSignals) signalsListView.getItems().add(signal.getName());
     }
 
     private void drawSignalCurve(Signal signal)
@@ -379,6 +591,7 @@ public class ViewController implements Initializable {
         if(!file.createNewFile()) System.out.println("File already exist. Overriding.");
 
         String fileType = exportSignalFileChooser.getSelectedExtensionFilter().getDescription();
+        signal.setName(file.getName().split("\\.")[0]);
 
         if(fileType.equals("Signal file"))
         {
@@ -420,4 +633,70 @@ public class ViewController implements Initializable {
 
         return importedSignals;
     }
+
+    void addRemoveSignalChart(String signalName)
+    {
+        XYChart.Series lineChartSeries = null;
+        for(XYChart.Series series : lineChart.getData())
+        {
+            if(series.getName().equals(signalName))
+            {
+                lineChartSeries = series;
+                break;
+            }
+        }
+
+        BarChart.Series barChartSeries = null;
+        for(BarChart.Series series : barChart.getData())
+        {
+            if(series.getName().equals(signalName))
+            {
+                barChartSeries = series;
+                break;
+            }
+        }
+
+        if(lineChartSeries != null && barChartSeries != null) {
+            lineChart.getData().remove(lineChartSeries);
+            barChart.getData().remove(barChartSeries);
+        }
+        else
+        {
+            for (Signal signal : loadedSignals) {
+                if (signal.getName().equals(signalName)) {
+                    drawSignalCurve(signal);
+                    drawHistogram(signal);
+                    break;
+                }
+            }
+        }
+    }
+
+    ArrayList<Signal> getSelectedSignals()
+    {
+        ArrayList<Signal> selectedSignals = new ArrayList<>();
+        for(String signalName : signalsListView.getSelectionModel().getSelectedItems())
+        {
+            for(Signal signal : loadedSignals)
+            {
+                if(signal.getName().equals(signalName))
+                {
+                    selectedSignals.add(signal);
+                    break;
+                }
+            }
+        }
+        return selectedSignals;
+    }
+
+    void showIncompatibleSignalsAlert()
+    {
+        Alert incompatibleSignalsAlert = new Alert(Alert.AlertType.ERROR);
+        incompatibleSignalsAlert.setTitle("Sygnały niekompatybilne");
+        incompatibleSignalsAlert.setContentText("Zaznaczone sygnały są ze sobą niekompatybilne.");
+        incompatibleSignalsAlert.setHeaderText(null);
+        incompatibleSignalsAlert.showAndWait();
+    }
+
+
 }

@@ -49,15 +49,29 @@
          <children>
             <TabPane tabClosingPolicy="UNAVAILABLE" GridPane.rowIndex="2" GridPane.rowSpan="7">
                <tabs>
-                  <Tab text="Szum">
+                  <Tab text="Operacje">
+                     <content>
+                        <GridPane vgap="1.0">
+                           <children>
+                              <ListView fx:id="signalsListView" prefHeight="200.0" prefWidth="200.0" GridPane.rowIndex="1" />
+                              <Label text="Sygnały:" />
+                           </children>
+                           <columnConstraints>
+                              <ColumnConstraints />
+                           </columnConstraints>
+                           <rowConstraints>
+                              <RowConstraints />
+                              <RowConstraints />
+                           </rowConstraints></GridPane>
+                     </content>
+                  </Tab>
+                  <Tab text="Generator">
                      <content>
                         <GridPane vgap="1.0">
                            <columnConstraints>
                               <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" />
                            </columnConstraints>
                            <rowConstraints>
-                              <RowConstraints minHeight="10.0" />
-                              <RowConstraints minHeight="10.0" />
                               <RowConstraints minHeight="10.0" />
                               <RowConstraints minHeight="10.0" />
                               <RowConstraints minHeight="10.0" />
@@ -85,11 +99,11 @@
                               <TextField fx:id="startingTimeInput" promptText="Wpisz czas początkowy [s]" GridPane.rowIndex="5" />
                               <TextField fx:id="amplitudeInput" promptText="Wpisz amplitudę" GridPane.rowIndex="7" />
                               <TextField fx:id="frequencyInput" promptText="Wpisz częstotliwość [Hz]" GridPane.rowIndex="9" />
-                              <TextField fx:id="fillFactorInput" disable="true" promptText="Wpisz współczynnik k" GridPane.rowIndex="13" />
-                              <TextField fx:id="jumpTimeInput" disable="true" promptText="Wpisz czas skoku [s]" GridPane.rowIndex="15" />
-                              <TextField fx:id="sampleNumberInput" disable="true" promptText="Wpisz number próbki dla skoku aplitudy" GridPane.rowIndex="17" />
-                              <TextField fx:id="probabilityInput" disable="true" promptText="Wpisz prawdopodobieństwo:" GridPane.rowIndex="19" />
-                              <Button fx:id="generateButton" minWidth="-Infinity" mnemonicParsing="false" prefWidth="75.0" text="Generuj" GridPane.halignment="CENTER" GridPane.rowIndex="20">
+                              <TextField fx:id="fillFactorInput" disable="true" promptText="Wpisz współczynnik k" GridPane.rowIndex="11" />
+                              <TextField fx:id="jumpTimeInput" disable="true" promptText="Wpisz czas skoku [s]" GridPane.rowIndex="13" />
+                              <TextField fx:id="sampleNumberInput" disable="true" promptText="Wpisz number próbki dla skoku aplitudy" GridPane.rowIndex="15" />
+                              <TextField fx:id="probabilityInput" disable="true" promptText="Wpisz prawdopodobieństwo:" GridPane.rowIndex="17" />
+                              <Button fx:id="generateButton" minWidth="-Infinity" mnemonicParsing="false" prefWidth="75.0" text="Generuj" GridPane.halignment="CENTER" GridPane.rowIndex="18">
                                  <GridPane.margin>
                                     <Insets bottom="5.0" top="10.0" />
                                  </GridPane.margin>
@@ -98,17 +112,14 @@
                               <Label text="Czas początkowy:" GridPane.rowIndex="4" />
                               <Label text="Amplituda:" GridPane.rowIndex="6" />
                               <Label text="Częstotliwość:" GridPane.rowIndex="8" />
-                              <Label text="Przedział histogramu:" GridPane.rowIndex="10" />
-                              <Slider fx:id="intervalSlider" blockIncrement="5" cache="true" majorTickUnit="5" max="20" min="5" minorTickCount="0" showTickLabels="true" showTickMarks="true" snapToTicks="true" value="5" GridPane.rowIndex="11" />
-                              <Label text="Współczynnik wypełnienia:" GridPane.rowIndex="12" />
-                              <Label text="Czas skoku:" GridPane.rowIndex="14" />
-                              <Label text="Numer próbki dla skoku:" GridPane.rowIndex="16" />
-                              <Label text="Prawdopodobieństwo:" GridPane.rowIndex="18" />
+                              <Label text="Współczynnik wypełnienia:" GridPane.rowIndex="10" />
+                              <Label text="Czas skoku:" GridPane.rowIndex="12" />
+                              <Label text="Numer próbki dla skoku:" GridPane.rowIndex="14" />
+                              <Label text="Prawdopodobieństwo:" GridPane.rowIndex="16" />
                            </children>
                         </GridPane>
                      </content>
                   </Tab>
-                  <Tab text="Działania" />
                </tabs>
             </TabPane>
             <Separator maxHeight="1.7976931348623157E308" orientation="VERTICAL" prefHeight="200.0" prefWidth="8.0" GridPane.columnIndex="1" GridPane.halignment="CENTER" GridPane.rowIndex="2" GridPane.rowSpan="7" GridPane.valignment="TOP">
@@ -153,6 +164,8 @@
                   <Label id="varianceVal" fx:id="varianceLabel" text="0" />
                   <Label text="Moc średnia:" />
                   <Label id="avgPowerVal" fx:id="averagePowerLabel" text="0" />
+                  <Label text="Przedział histogramu:" />
+                  <Slider fx:id="intervalSlider" blockIncrement="5" cache="true" majorTickUnit="5" max="20" min="5" minorTickCount="0" showTickLabels="true" showTickMarks="true" snapToTicks="true" value="5" />
                </children>
             </VBox>
          </children>
