@@ -99,7 +99,7 @@
                               <TextField fx:id="durationInput" prefWidth="200.0" promptText="Wpisz czas trwania [s]" GridPane.rowIndex="3" />
                               <TextField fx:id="startingTimeInput" promptText="Wpisz czas początkowy [s]" GridPane.rowIndex="5" />
                               <TextField fx:id="amplitudeInput" promptText="Wpisz amplitudę" GridPane.rowIndex="7" />
-                              <TextField fx:id="frequencyInput" promptText="Wpisz częstotliwość [Hz]" GridPane.rowIndex="9" />
+                              <TextField fx:id="frequencyInput" promptText="Wpisz częstotliwość próbkowania [Hz]" GridPane.rowIndex="9" />
                               <TextField fx:id="periodInput" disable="true" promptText="Wpisz okres sygnału [s]" GridPane.rowIndex="11" />
                               <TextField fx:id="fillFactorInput" disable="true" promptText="Wpisz współczynnik k" GridPane.rowIndex="13" />
                               <TextField fx:id="jumpTimeInput" disable="true" promptText="Wpisz czas skoku [s]" GridPane.rowIndex="15" />
@@ -113,7 +113,7 @@
                               <Label text="Czas trwania:" GridPane.rowIndex="2" />
                               <Label text="Czas początkowy:" GridPane.rowIndex="4" />
                               <Label text="Amplituda:" GridPane.rowIndex="6" />
-                              <Label text="Częstotliwość:" GridPane.rowIndex="8" />
+                              <Label text="Częstotliwość próbkowania:" GridPane.rowIndex="8" />
                               <Label text="Okres sygnału:" GridPane.rowIndex="10" />
                               <Label text="Współczynnik wypełnienia:" GridPane.rowIndex="12" />
                               <Label text="Czas skoku:" GridPane.rowIndex="14" />
