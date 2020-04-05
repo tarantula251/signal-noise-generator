@@ -12,6 +12,7 @@ import javafx.scene.chart.*;
 import javafx.scene.control.*;
 import javafx.scene.input.MouseButton;
 import javafx.stage.FileChooser;
+import javafx.stage.Stage;
 import model.signal.Sample;
 import model.signal.Signal;
 import model.signal.SignalException;
@@ -182,7 +183,7 @@ public class ViewController implements Initializable {
                     ContextMenu contextMenu = new ContextMenu();
                     MenuItem addToChartItem = new MenuItem();
 
-                    addToChartItem.textProperty().bind(Bindings.format("Dodaj/Usuń z wyrkesu"));
+                    addToChartItem.textProperty().bind(Bindings.format("Dodaj/Usuń z wykresu"));
                     addToChartItem.setOnAction(event -> {
                         addRemoveSignalChart(cell.getItem());
                     });
@@ -745,5 +746,9 @@ public class ViewController implements Initializable {
         incompatibleSignalsAlert.showAndWait();
     }
 
-
+    public void closeApp(ActionEvent actionEvent) {
+        Stage stage = (Stage) menuBar.getScene().getWindow();
+        stage.close();
+        System.exit(0);
+    }
 }

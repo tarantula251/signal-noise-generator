@@ -21,7 +21,7 @@
             <items>
                   <MenuItem fx:id="importMenuItem" mnemonicParsing="false" text="Importuj..." />
                   <SeparatorMenuItem mnemonicParsing="false" />
-              <MenuItem mnemonicParsing="false" text="Zamknij" />
+              <MenuItem fx:id="closeAppMenuItem" mnemonicParsing="false" onAction="#closeApp" text="Zamknij" />
             </items>
           </Menu>
         </menus>
