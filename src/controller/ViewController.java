@@ -516,7 +516,8 @@ public class ViewController implements Initializable {
                         fillFactorInput.textProperty(),
                         jumpTimeInput.textProperty(),
                         sampleNumberInput.textProperty(),
-                        probabilityInput.textProperty());
+                        probabilityInput.textProperty(),
+                        periodInput.textProperty());
             }
             @Override
             protected boolean computeValue() {
@@ -527,7 +528,8 @@ public class ViewController implements Initializable {
                         || (!fillFactorInput.isDisabled() && fillFactorInput.getText().isEmpty())
                         || (!jumpTimeInput.isDisabled() && jumpTimeInput.getText().isEmpty())
                         || (!sampleNumberInput.isDisabled() && sampleNumberInput.getText().isEmpty())
-                        || (!probabilityInput.isDisabled() && probabilityInput.getText().isEmpty()));
+                        || (!probabilityInput.isDisabled() && probabilityInput.getText().isEmpty())
+                        || (!periodInput.isDisabled() && periodInput.getText().isEmpty()));
             }
         };
         generateButton.disableProperty().bind(binding);
