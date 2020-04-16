@@ -13,10 +13,9 @@ public class GaussianSignalGenerator implements SignalGenerator {
         int samplesCount = (int)(duration * frequency);
         double samplesDistance = duration / samplesCount;
 
-        final int div = 10; //Not sure what value should it be. I used 10 for testing and it seems to work well.
+        final int div = 2; //The lower value is, the flatter will be histogram
 
         double min = -amplitude;
-        double max = amplitude;
 
         Random random = new Random();
 
@@ -25,12 +24,10 @@ public class GaussianSignalGenerator implements SignalGenerator {
             double value = 0;
             for(int j = 0; j < div; ++j)
             {
-                value += random.nextDouble() * ((max/div - min/div) + 1) + min/div;
+                value += (random.nextDouble() * Math.abs(amplitude * 2) + min)/div;
             }
             samples.add(new Sample(beginTime + (i * samplesDistance), value));
         }
-
-        samples.get(random.nextInt(samples.size())).value = random.nextDouble() >= 0.5 ? max : min;
 
         return new Signal(samples, duration, amplitude, frequency);
     }

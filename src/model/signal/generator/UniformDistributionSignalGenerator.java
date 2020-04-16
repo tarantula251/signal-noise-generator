@@ -14,16 +14,13 @@ public class UniformDistributionSignalGenerator implements SignalGenerator {
         double samplesDistance = duration / samplesCount;
 
         double min = -amplitude;
-        double max = amplitude;
 
         Random random = new Random();
 
         for(int i = 0; i < samplesCount; ++i)
         {
-            samples.add(new Sample(beginTime + (i * samplesDistance), random.nextDouble() * ((max - min) + 1) + min));
+            samples.add(new Sample(beginTime + (i * samplesDistance), random.nextDouble() * Math.abs(amplitude * 2) + min));
         }
-
-        samples.get(random.nextInt(samples.size())).value = random.nextDouble() >= 0.5 ? max : min;
 
         return new Signal(samples, duration, amplitude, frequency);
     }

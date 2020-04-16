@@ -20,6 +20,7 @@ import model.signal.generator.SignalGenerator;
 import model.signal.generator.SignalGeneratorFactory;
 
 import java.io.*;
+import java.math.RoundingMode;
 import java.net.URL;
 import java.text.DecimalFormat;
 import java.time.LocalDateTime;
@@ -430,28 +431,38 @@ public class ViewController implements Initializable {
     private void drawHistogram(Signal signal)
     {
         if(signal == null) return;
-        int interval = (int) intervalSlider.getValue();
-        int lowestPossibleValue = (int)Math.floor(-signal.getAmplitude());
-        TreeMap<Integer, Integer> histogramIntervals = new TreeMap<>();
+        double interval = (Math.abs(signal.getAmplitude()) * 2) / intervalSlider.getValue();
+        double lowestPossibleValue = -signal.getAmplitude();
+        TreeMap<Double, Integer> histogramIntervals = new TreeMap<>(new Comparator<Double>() {
+            @Override
+            public int compare(Double aDouble, Double t1) {
+                return Math.abs(aDouble - t1) < 0.0000000001 ? 0 : Double.compare(aDouble, t1);
+            }
+        });
+        for(int i = 1; i <= intervalSlider.getValue(); ++i)
+        {
+            histogramIntervals.put(lowestPossibleValue + i * interval, 0);
+        }
         for(Sample sample : signal.getSamples())
         {
-            int sampleInterval = lowestPossibleValue;
+            double sampleInterval = lowestPossibleValue;
             while(sampleInterval < sample.value)
             {
                 sampleInterval += interval;
             }
             Integer sampleCount = histogramIntervals.get(sampleInterval);
-            if(sampleCount == null) histogramIntervals.put(sampleInterval, 1);
-            else histogramIntervals.put(sampleInterval, sampleCount + 1);
+            histogramIntervals.put(sampleInterval, sampleCount + 1);
         }
         if(histogramIntervals.isEmpty()) return;
 
         barChart.getData().add(new BarChart.Series<>());
         BarChart.Series series = barChart.getData().get(barChart.getData().size() - 1);
         series.setName(signal.getName());
-        for(Map.Entry<Integer, Integer> histogramInterval : histogramIntervals.entrySet())
+        DecimalFormat decimalFormat = new DecimalFormat();
+        decimalFormat.setRoundingMode(RoundingMode.UP);
+        for(Map.Entry<Double, Integer> histogramInterval : histogramIntervals.entrySet())
         {
-            series.getData().add(new BarChart.Data<String, Number>("< " + Integer.toString(histogramInterval.getKey() - interval) + " , " + histogramInterval.getKey().toString() + " >", histogramInterval.getValue()));
+            series.getData().add(new BarChart.Data<String, Number>("< " + decimalFormat.format(histogramInterval.getKey() - interval) + " , " + decimalFormat.format(histogramInterval.getKey()) + " >", histogramInterval.getValue()));
         }
     }
 
