@@ -445,7 +445,7 @@ public class ViewController implements Initializable {
         }
         for(Sample sample : signal.getSamples())
         {
-            double sampleInterval = lowestPossibleValue;
+            double sampleInterval = lowestPossibleValue + interval;
             while(sampleInterval < sample.value)
             {
                 sampleInterval += interval;
