@@ -15,7 +15,7 @@ public class PulseNoiseGenerator implements SignalGenerator {
         double samplesDistance = duration / samplesCount;
         Random random = new Random();
 
-        for(int i = 0; i <= samplesCount; ++i)
+        for(int i = 0; i < samplesCount; ++i)
         {
             double time = beginTime + (i * samplesDistance);
             if (probability > random.nextDouble()) {

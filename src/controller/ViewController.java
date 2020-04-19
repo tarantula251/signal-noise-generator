@@ -535,7 +535,7 @@ public class ViewController implements Initializable {
                 return (durationInput.getText().isEmpty()
                         || startingTimeInput.getText().isEmpty()
                         || amplitudeInput.getText().isEmpty()
-                        || (!frequencyInput.isDisabled() && frequencyInput.getText().isEmpty())
+                        || frequencyInput.getText().isEmpty()
                         || (!fillFactorInput.isDisabled() && fillFactorInput.getText().isEmpty())
                         || (!jumpTimeInput.isDisabled() && jumpTimeInput.getText().isEmpty())
                         || (!sampleNumberInput.isDisabled() && sampleNumberInput.getText().isEmpty())
@@ -574,9 +574,7 @@ public class ViewController implements Initializable {
             }
             if (SignalGeneratorFactory.SIGNAL_TYPE_S9_VALUE.equalsIgnoreCase(String.valueOf(newValue))) {
                 jumpTimeInput.setDisable(false);
-                frequencyInput.setDisable(true);
             } else {
-                frequencyInput.setDisable(false);
                 jumpTimeInput.setDisable(true);
             }
             if (SignalGeneratorFactory.SIGNAL_TYPE_S10_VALUE.equalsIgnoreCase(String.valueOf(newValue))) {

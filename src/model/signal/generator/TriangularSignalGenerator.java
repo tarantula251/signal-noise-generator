@@ -13,7 +13,7 @@ public class TriangularSignalGenerator implements SignalGenerator {
         int samplesCount = (int)(duration * frequency);
         int samplesPerPeriod = (int)(samplesCount / (duration / period));
         double samplesDistance = duration / samplesCount;
-        for(int i = 0; i <= samplesCount; ++i)
+        for(int i = 0; i < samplesCount; ++i)
         {
             int K = i  / samplesPerPeriod;
             double time = beginTime + (i * samplesDistance);

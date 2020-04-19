@@ -6,15 +6,14 @@ import model.signal.Signal;
 import java.util.ArrayList;
 
 public class HeavisideStepGenerator implements SignalGenerator {
-    private static final int SAMPLES_COUNT = 136;
 
     @Override
     public Signal generate(Double duration, Double beginTime, Double amplitude, Double frequency, Double period, Double fillFactor, Double jumpTime, Integer sampleNumber, Double probability) {
         ArrayList<Sample> samples = new ArrayList<>();
-        int samplesCount = (int)(duration * SAMPLES_COUNT);
+        int samplesCount = (int)(duration * frequency);
         double samplesDistance = duration / samplesCount;
 
-        for(int i = 0; i <= samplesCount; ++i)
+        for(int i = 0; i < samplesCount; ++i)
         {
             double time = beginTime + (i * samplesDistance);
             double value;

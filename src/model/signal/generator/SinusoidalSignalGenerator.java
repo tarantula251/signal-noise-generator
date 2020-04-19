@@ -12,7 +12,7 @@ public class SinusoidalSignalGenerator implements SignalGenerator {
         int samplesCount = (int)(duration * frequency);
         double samplesDistance = duration / samplesCount;
 
-        for(int i = 0; i <= samplesCount; ++i)
+        for(int i = 0; i < samplesCount; ++i)
         {
             samples.add(new Sample(beginTime + (i * samplesDistance), amplitude * Math.sin(2 * Math.PI * (i * samplesDistance) / period)));
         }

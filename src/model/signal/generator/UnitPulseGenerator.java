@@ -13,7 +13,7 @@ public class UnitPulseGenerator implements SignalGenerator {
         int samplesCount = (int)(duration * frequency);
         double samplesDistance = duration / samplesCount;
 
-        for(int i = 0; i <= samplesCount; ++i)
+        for(int i = 0; i < samplesCount; ++i)
         {
             double time = beginTime + (i * samplesDistance);
             if (time == sampleNumber) {
