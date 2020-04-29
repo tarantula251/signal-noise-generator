@@ -433,12 +433,7 @@ public class ViewController implements Initializable {
         if(signal == null) return;
         double interval = (Math.abs(signal.getAmplitude()) * 2) / intervalSlider.getValue();
         double lowestPossibleValue = -signal.getAmplitude();
-        TreeMap<Double, Integer> histogramIntervals = new TreeMap<>(new Comparator<Double>() {
-            @Override
-            public int compare(Double aDouble, Double t1) {
-                return Math.abs(aDouble - t1) < 0.0000000001 ? 0 : Double.compare(aDouble, t1);
-            }
-        });
+        TreeMap<Double, Integer> histogramIntervals = new TreeMap<>(SignalGenerator.doubleComparator);
         for(int i = 1; i <= intervalSlider.getValue(); ++i)
         {
             histogramIntervals.put(lowestPossibleValue + i * interval, 0);
@@ -446,7 +441,7 @@ public class ViewController implements Initializable {
         for(Sample sample : signal.getSamples())
         {
             double sampleInterval = lowestPossibleValue + interval;
-            while(sampleInterval < sample.value)
+            while(SignalGenerator.doubleComparator.compare(sampleInterval, sample.value) < 0)
             {
                 sampleInterval += interval;
             }
