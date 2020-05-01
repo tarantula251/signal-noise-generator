@@ -2,6 +2,7 @@ package model.signal;
 
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.function.DoubleBinaryOperator;
 
 public class Signal implements Serializable {
@@ -19,6 +20,13 @@ public class Signal implements Serializable {
     private double effectiveValue;
     private double variance;
     private boolean continuous = true;
+
+    public static Comparator<Double> doubleComparator = new Comparator<Double>() {
+        @Override
+        public int compare(Double aDouble, Double t1) {
+            return Math.abs(aDouble - t1) < 0.0000000001 ? 0 : Double.compare(aDouble, t1);
+        }
+    };
 
     @Override
     public String toString() {

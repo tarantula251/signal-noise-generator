@@ -16,6 +16,8 @@ import javafx.stage.Stage;
 import model.signal.Sample;
 import model.signal.Signal;
 import model.signal.SignalException;
+import model.signal.converter.ADConverter;
+import model.signal.converter.TruncationQuantizer;
 import model.signal.generator.SignalGenerator;
 import model.signal.generator.SignalGeneratorFactory;
 
@@ -259,6 +261,27 @@ public class ViewController implements Initializable {
                         }
                     });
 
+                    Menu convertMenu = new Menu("Konwersja");
+                    MenuItem ADConversionItem = new MenuItem();
+                    ADConversionItem.textProperty().bind(Bindings.format("Analogowo-cyfrowa"));
+                    ADConversionItem.setOnAction(event ->
+                    {
+                        ADConverter converter = new ADConverter(new TruncationQuantizer(3));
+                        for(Signal signal : loadedSignals)
+                        {
+                            if(signal.getName().equals(cell.getItem()))
+                            {
+                                Signal converted = converter.convert(signal, signal.getFrequency() /2);
+                                if(converted == null) break;
+                                converted.setName("AD converted " + signal.getName());
+                                loadedSignals.add(converted);
+                                refreshSignalsListView();
+                                break;
+                            }
+                        }
+                    });
+
+                    convertMenu.getItems().addAll(ADConversionItem);
 
                     contextMenu.getItems().add(addToChartItem);
 
@@ -366,6 +389,7 @@ public class ViewController implements Initializable {
 
                         contextMenu.getItems().add(performActionOnSelectedMenu);
                     }
+                    else contextMenu.getItems().add(convertMenu);
 
                     contextMenu.getItems().addAll(
                             new SeparatorMenuItem(),
@@ -433,7 +457,7 @@ public class ViewController implements Initializable {
         if(signal == null) return;
         double interval = (Math.abs(signal.getAmplitude()) * 2) / intervalSlider.getValue();
         double lowestPossibleValue = -signal.getAmplitude();
-        TreeMap<Double, Integer> histogramIntervals = new TreeMap<>(SignalGenerator.doubleComparator);
+        TreeMap<Double, Integer> histogramIntervals = new TreeMap<>(Signal.doubleComparator);
         for(int i = 1; i <= intervalSlider.getValue(); ++i)
         {
             histogramIntervals.put(lowestPossibleValue + i * interval, 0);
@@ -441,7 +465,7 @@ public class ViewController implements Initializable {
         for(Sample sample : signal.getSamples())
         {
             double sampleInterval = lowestPossibleValue + interval;
-            while(SignalGenerator.doubleComparator.compare(sampleInterval, sample.value) < 0)
+            while(Signal.doubleComparator.compare(sampleInterval, sample.value) < 0)
             {
                 sampleInterval += interval;
             }

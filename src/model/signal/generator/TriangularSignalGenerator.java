@@ -20,8 +20,8 @@ public class TriangularSignalGenerator implements SignalGenerator {
             double time = beginTime + (i * samplesDistance);
             double leftBound = K * period + beginTime;
             double rightBound = fillFactor * period + leftBound;
-            int timeToLeftBoundComparison = doubleComparator.compare(time, leftBound);
-            int timeToRightBoundComparison = doubleComparator.compare(time, rightBound);
+            int timeToLeftBoundComparison = Signal.doubleComparator.compare(time, leftBound);
+            int timeToRightBoundComparison = Signal.doubleComparator.compare(time, rightBound);
             if (timeToLeftBoundComparison >= 0  && timeToRightBoundComparison < 0) {
                 samples.add(new Sample(time, (amplitude * (time - K * period - beginTime)) / (fillFactor * period)));
             }
