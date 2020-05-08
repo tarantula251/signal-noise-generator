@@ -1,6 +1,7 @@
 package model.signal.converter;
 
 import model.signal.Sample;
+import model.signal.Signal;
 
 import java.util.ArrayList;
 

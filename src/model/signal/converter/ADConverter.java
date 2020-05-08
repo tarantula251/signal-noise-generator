@@ -14,6 +14,7 @@ public class ADConverter implements Converter
     }
 
     private Quantizer quantizer;
+    private Signal postSamplingSignal = null;
 
     private ArrayList<Sample> calculateSamples(Signal signal, double frequency)
     {
@@ -52,6 +53,7 @@ public class ADConverter implements Converter
                     else
                     {
                         System.err.println("Not enough samples in input signal to calculate converted samples.");
+                        return null;
                     }
 
                 }
@@ -80,14 +82,25 @@ public class ADConverter implements Converter
             System.err.println("Calculating samples failed.");
             return null;
         }
+        postSamplingSignal = new Signal(new ArrayList<>(samples), signal.getDuration(), signal.getAmplitude(), frequency);
 
-        samples = quantizer.quantize(samples);
-        if(samples == null)
+        if(quantizer != null)
         {
-            System.err.println("Samples quantization failed.");
-            return null;
+            samples = quantizer.quantize(samples);
+            if(samples == null)
+            {
+                System.err.println("Samples quantization failed.");
+                return null;
+            }
         }
 
-        return new Signal(samples, signal.getDuration(), signal.getAmplitude(), frequency);
+        Signal result = new Signal(samples, signal.getDuration(), signal.getAmplitude(), frequency);
+        postSamplingSignal.calculateMeasurements(result);
+        return result;
+    }
+
+    public Signal getPostSamplingSignal()
+    {
+        return postSamplingSignal;
     }
 }
