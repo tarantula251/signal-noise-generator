@@ -25,15 +25,12 @@ public class SincFunctionConversionStrategy implements ConversionStrategy
         double value = 0;
         double step = signal.getSamples().size() / (double)samplesCount;
         int lastIndex = -1;
-        int cc = 0;
         for(double i = 0; i < signal.getSamples().size(); i+=step)
         {
             int index = (int)i;
             if(index == lastIndex) continue;
             value += signal.getSamples().get(index).value * sinc(time / samplesDistance - i);
-            ++cc;
         }
-        System.out.println(cc + " samples included.");
         return value;
     }
 
