@@ -33,7 +33,7 @@
          </rowConstraints>
          <children>
             <Label prefHeight="17.0" prefWidth="192.0" text="Częstotliwość próbkowania:" />
-            <TextField fx:id="textFieldFrequency" promptText="[ms]" GridPane.rowIndex="1" />
+            <TextField fx:id="textFieldFrequency" promptText="[Hz]" GridPane.rowIndex="1" />
             <Label text="Kwantyzator:" GridPane.rowIndex="2" />
             <ComboBox fx:id="comboBoxQuantizer" prefWidth="200.0" promptText="-" GridPane.rowIndex="3" />
             <Label text="Bity kwantyzatora:" GridPane.rowIndex="4" />
