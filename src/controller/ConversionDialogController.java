@@ -197,7 +197,12 @@ public class ConversionDialogController implements Initializable
 
                 ADConverter converterAD = new ADConverter(quantizer);
                 double samplingFrequency = Double.parseDouble(textFieldFrequency.getText());
-                tempOutputSignal = converterAD.convert(signal, samplingFrequency);
+                try {
+                    tempOutputSignal = converterAD.convert(signal, samplingFrequency);
+                } catch (ADConverter.ADConverterException e) {
+                    showADConverterAlert(e.getMessage());
+                    return;
+                }
                 showADMeasurements(tempOutputSignal);
                 if(conversionStrategy != null)
                 {
@@ -221,6 +226,15 @@ public class ConversionDialogController implements Initializable
                 if(saveOutputSignal()) stage.close();
             }
         });
+    }
+
+    void showADConverterAlert(String errorMessage)
+    {
+        Alert incompatibleSignalsAlert = new Alert(Alert.AlertType.ERROR);
+        incompatibleSignalsAlert.setTitle("Błąd konwersji");
+        incompatibleSignalsAlert.setContentText(errorMessage);
+        incompatibleSignalsAlert.setHeaderText(null);
+        incompatibleSignalsAlert.showAndWait();
     }
 
     public void initData(Signal signal)

@@ -3,5 +3,5 @@ package model.signal.converter;
 import model.signal.Signal;
 
 public interface Converter {
-    public abstract Signal convert(Signal signal, double frequency);
+    public abstract Signal convert(Signal signal, double frequency) throws ADConverter.ADConverterException;
 }

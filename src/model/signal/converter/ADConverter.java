@@ -16,12 +16,10 @@ public class ADConverter implements Converter
     private Quantizer quantizer;
     private Signal postSamplingSignal = null;
 
-    private ArrayList<Sample> calculateSamples(Signal signal, double frequency)
-    {
+    private ArrayList<Sample> calculateSamples(Signal signal, double frequency) throws ADConverterException {
         if(signal.getSamples().size() < 2)
         {
-            System.err.println("Input signal has not enough samples.");
-            return null;
+            throw new ADConverterException("Sygnał wejściowy ma niewystarczającą liczbę próbek.");
         }
 
         ArrayList<Sample> result = new ArrayList<>();
@@ -52,8 +50,7 @@ public class ADConverter implements Converter
                     }
                     else
                     {
-                        System.err.println("Not enough samples in input signal to calculate converted samples.");
-                        return null;
+                        throw new ADConverterException("Zbyt mało próbek w sygnale wejściowym, aby obliczyć przekonwertowane próbki.");
                     }
 
                 }
@@ -74,13 +71,11 @@ public class ADConverter implements Converter
 
 
     @Override
-    public Signal convert(Signal signal, double frequency)
-    {
+    public Signal convert(Signal signal, double frequency) throws ADConverterException {
         ArrayList<Sample> samples = calculateSamples(signal, frequency);
         if(samples == null)
         {
-            System.err.println("Calculating samples failed.");
-            return null;
+            throw new ADConverterException("Błąd przy obliczaniu próbek.");
         }
         postSamplingSignal = new Signal(new ArrayList<>(samples), signal.getDuration(), signal.getAmplitude(), frequency);
 
@@ -89,8 +84,7 @@ public class ADConverter implements Converter
             samples = quantizer.quantize(samples);
             if(samples == null)
             {
-                System.err.println("Samples quantization failed.");
-                return null;
+                throw new ADConverterException("Błąd kwantyzacji próbek.");
             }
         }
 
@@ -102,5 +96,11 @@ public class ADConverter implements Converter
     public Signal getPostSamplingSignal()
     {
         return postSamplingSignal;
+    }
+
+    public class ADConverterException extends Exception {
+        public ADConverterException(String message) {
+            super(message);
+        }
     }
 }
