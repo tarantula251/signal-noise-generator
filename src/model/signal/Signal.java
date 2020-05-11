@@ -2,12 +2,15 @@ package model.signal;
 
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.function.DoubleBinaryOperator;
 
 public class Signal implements Serializable {
 
     private String name;
     private ArrayList<Sample> samples;
+    
+    //Parameters
     private double duration;
     private double amplitude;
     private double frequency;
@@ -19,6 +22,19 @@ public class Signal implements Serializable {
     private double effectiveValue;
     private double variance;
     private boolean continuous = true;
+    
+    //Measurements
+    private double meanSquareError;
+    private double signalNoiseRatio;
+    private double peakSignalNoiseRation;
+    private double maximumDifference;
+
+    public static Comparator<Double> doubleComparator = new Comparator<Double>() {
+        @Override
+        public int compare(Double aDouble, Double t1) {
+            return Math.abs(aDouble - t1) < 0.0000000001 ? 0 : Double.compare(aDouble, t1);
+        }
+    };
 
     @Override
     public String toString() {
@@ -119,6 +135,36 @@ public class Signal implements Serializable {
         calculateSignalParameters();
     }
 
+    public void calculateMeasurements(Signal signal)
+    {
+        if(samples.isEmpty()) return;
+        if(samples.size() != signal.samples.size()) return;
+        double meanSquareValueDiff = 0;
+        double valueSquaresSum = 0;
+        double maxValue = samples.get(0).value;
+        double maxMeanValueDiff = samples.get(0).value - signal.samples.get(0).value;
+        for(int i = 0; i < samples.size(); ++i)
+        {
+            Sample sample = samples.get(i);
+            Sample sampleToCompare = signal.samples.get(i);
+
+            double sampleMeanValueDiff = sample.value - sampleToCompare.value;
+            maxMeanValueDiff = Math.max(maxMeanValueDiff, sampleMeanValueDiff);
+            maxValue = Math.max(maxValue, sample.value);
+            valueSquaresSum += Math.pow(sample.value, 2);
+            meanSquareValueDiff += Math.pow(sampleMeanValueDiff, 2);
+        }
+
+        meanSquareError = meanSquareValueDiff / samples.size();
+        signalNoiseRatio = 10 * Math.log10(valueSquaresSum / meanSquareValueDiff);
+        peakSignalNoiseRation = 10 * Math.log10(maxValue / meanSquareError);
+        maximumDifference = maxMeanValueDiff;
+        signal.meanSquareError = meanSquareError;
+        signal.signalNoiseRatio = signalNoiseRatio;
+        signal.peakSignalNoiseRation = peakSignalNoiseRation;
+        signal.maximumDifference = maximumDifference;
+    }
+
     public String getName() {
         return name;
     }
@@ -171,6 +217,26 @@ public class Signal implements Serializable {
         return variance;
     }
 
+    public double getMeanSquareError()
+    {
+        return meanSquareError;
+    }
+
+    public double getSignalNoiseRatio()
+    {
+        return signalNoiseRatio;
+    }
+
+    public double getPeakSignalNoiseRation()
+    {
+        return peakSignalNoiseRation;
+    }
+
+    public double getMaximumDifference()
+    {
+        return maximumDifference;
+    }
+
     public boolean isContinuous() {
         return continuous;
     }
@@ -204,19 +270,25 @@ public class Signal implements Serializable {
             if(Double.isFinite(resultSample.value)) resultSamples.add(resultSample);
         }
 
-        return new Signal(resultSamples, duration, amplitude, frequency, fillFactor);
+        return new Signal(resultSamples, duration,  amplitude, frequency, fillFactor);
 }
 
     public Signal add(Signal signal) throws SignalException {
-        return performAction(signal, Double::sum);
+        Signal result = performAction(signal, Double::sum);
+        result.amplitude += signal.amplitude;
+        return result;
     }
 
     public Signal subtract(Signal signal) throws SignalException {
-        return performAction(signal, (a, b) -> a-b);
+        Signal result = performAction(signal, (a, b) -> a-b);
+        result.amplitude += signal.amplitude;
+        return result;
     }
 
     public Signal multiply(Signal signal) throws SignalException {
-        return performAction(signal, (a, b) -> a*b);
+        Signal result = performAction(signal, (a, b) -> a*b);
+        result.amplitude *= signal.amplitude;
+        return result;
     }
 
     public Signal divide(Signal signal) throws SignalException {

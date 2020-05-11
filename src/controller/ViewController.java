@@ -7,11 +7,14 @@ import javafx.beans.value.ObservableValue;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.fxml.FXML;
+import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
+import javafx.scene.Scene;
 import javafx.scene.chart.*;
 import javafx.scene.control.*;
 import javafx.scene.input.MouseButton;
 import javafx.stage.FileChooser;
+import javafx.stage.Modality;
 import javafx.stage.Stage;
 import model.signal.Sample;
 import model.signal.Signal;
@@ -259,6 +262,31 @@ public class ViewController implements Initializable {
                         }
                     });
 
+                    MenuItem convertItem = new MenuItem();
+                    convertItem.textProperty().bind(Bindings.format("Konwersja"));
+                    convertItem.setOnAction(event ->
+                    {
+                        for(Signal signal : loadedSignals)
+                        {
+                            if(signal.getName().equals(cell.getItem()))
+                            {
+                                try
+                                {
+                                    Signal outputSignal = openADConversionDialog(signal);
+                                    if(outputSignal != null)
+                                    {
+                                        loadedSignals.add(outputSignal);
+                                        refreshSignalsListView();
+                                    }
+                                }
+                                catch(IOException e)
+                                {
+                                    e.printStackTrace();
+                                }
+                                break;
+                            }
+                        }
+                    });
 
                     contextMenu.getItems().add(addToChartItem);
 
@@ -366,6 +394,7 @@ public class ViewController implements Initializable {
 
                         contextMenu.getItems().add(performActionOnSelectedMenu);
                     }
+                    else contextMenu.getItems().add(convertItem);
 
                     contextMenu.getItems().addAll(
                             new SeparatorMenuItem(),
@@ -408,32 +437,13 @@ public class ViewController implements Initializable {
         }
     }
 
-    private void drawSignalPoints(Signal signal)
-    {
-        if(signal == null) return;
-        if (scatterChart.isVisible()) {
-            scatterChart.getData().add(new XYChart.Series<Number, Number>());
-            XYChart.Series<Number, Number> series = scatterChart.getData().get(scatterChart.getData().size() - 1);
-            series.setName(signal.getName());
-            double minTime = signal.getSamples().get(0).time;
-            double maxTime = signal.getSamples().get(signal.getSamples().size() - 1).time;
-            for (Sample sample : signal.getSamples()) {
-                series.getData().add(new XYChart.Data<Number, Number>(sample.time, sample.value));
-            }
-            // adjust bounds of x axis
-            scatterChart.getXAxis().setAutoRanging(false);
-            scatterXAxis.setUpperBound(maxTime + 1.0);
-            scatterXAxis.setLowerBound(minTime - 1.0);
-        }
-    }
-
 
     private void drawHistogram(Signal signal)
     {
         if(signal == null) return;
         double interval = (Math.abs(signal.getAmplitude()) * 2) / intervalSlider.getValue();
         double lowestPossibleValue = -signal.getAmplitude();
-        TreeMap<Double, Integer> histogramIntervals = new TreeMap<>(SignalGenerator.doubleComparator);
+        TreeMap<Double, Integer> histogramIntervals = new TreeMap<>(Signal.doubleComparator);
         for(int i = 1; i <= intervalSlider.getValue(); ++i)
         {
             histogramIntervals.put(lowestPossibleValue + i * interval, 0);
@@ -441,7 +451,7 @@ public class ViewController implements Initializable {
         for(Sample sample : signal.getSamples())
         {
             double sampleInterval = lowestPossibleValue + interval;
-            while(SignalGenerator.doubleComparator.compare(sampleInterval, sample.value) < 0)
+            while(Signal.doubleComparator.compare(sampleInterval, sample.value) < 0)
             {
                 sampleInterval += interval;
             }
@@ -757,4 +767,29 @@ public class ViewController implements Initializable {
         stage.close();
         System.exit(0);
     }
+
+    public Signal openADConversionDialog(Signal signal) throws IOException
+    {
+        FXMLLoader loader = new FXMLLoader(getClass().getResource("../view/layout/ConversionDialog.fxml"));
+        Stage stage = getDialogStage(loader, true);
+        ConversionDialogController controller = loader.getController();
+        controller.initData(signal);
+        controller.setStage(stage);
+        stage.showAndWait();
+        return controller.getOutputSignal();
+    }
+
+    private Stage getDialogStage(FXMLLoader loader, boolean resizable) throws IOException
+    {
+        Stage stage = new Stage();
+        stage.initOwner(signalsListView.getScene().getWindow());
+        stage.initModality(Modality.WINDOW_MODAL);
+        Scene scene = new Scene(loader.load());
+        stage.setScene(scene);
+        stage.setMinHeight(stage.getHeight());
+        stage.setMinWidth(stage.getWidth());
+        stage.setResizable(resizable);
+        return stage;
+    }
+
 }
