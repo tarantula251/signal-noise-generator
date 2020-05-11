@@ -26,7 +26,7 @@
           </Menu>
         </menus>
       </MenuBar>
-      <GridPane fx:id="mainGrid" stylesheets="/view/style.css" GridPane.rowIndex="2">
+      <GridPane fx:id="mainGrid" stylesheets="/view/resources/style.css" GridPane.rowIndex="2">
          <columnConstraints>
             <ColumnConstraints />
             <ColumnConstraints maxWidth="29.0" minWidth="22.0" prefWidth="22.0" />
