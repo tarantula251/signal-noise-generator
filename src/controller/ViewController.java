@@ -43,8 +43,6 @@ public class ViewController implements Initializable {
     @FXML private TextField probabilityInput;
     @FXML private LineChart<Number, Number> lineChart;
     @FXML private BarChart<Number, Number> barChart;
-    @FXML private ScatterChart<Number, Number> scatterChart;
-    @FXML private NumberAxis scatterXAxis;
     @FXML private Button generateButton;
     @FXML private Slider intervalSlider;
     @FXML private Label averageLabel;
@@ -385,11 +383,28 @@ public class ViewController implements Initializable {
                             refreshSignalsListView();
                         });
 
+                        MenuItem signalConvolutionMenuItem = new MenuItem("Dokonaj splotu");
+                        signalConvolutionMenuItem.setOnAction(actionEvent ->
+                        {
+                            ArrayList<Signal> signals = getSelectedSignals();
+                            if(signals.isEmpty()) return;
+
+                            Signal primarySignal = signals.get(0);
+                            Signal secondarySignal = signals.get(1);
+                            primarySignal = primarySignal.convolute(secondarySignal);
+
+                            primarySignal.setName("Convolution product of selected " + LocalDateTime.now().toString().replace('.', '_').replace(':', '_'));
+
+                            loadedSignals.add(primarySignal);
+                            refreshSignalsListView();
+                        });
+
                         performActionOnSelectedMenu.getItems().addAll(
                                 sumSelectedMenuItem,
                                 subtractSelectedMenuItem,
                                 multiplySelectedMenuItem,
-                                divideSelectedMenuItem
+                                divideSelectedMenuItem,
+                                signalConvolutionMenuItem
                         );
 
                         contextMenu.getItems().add(performActionOnSelectedMenu);
@@ -401,8 +416,6 @@ public class ViewController implements Initializable {
                             exportItem,
                             editItem,
                             deleteItem);
-
-
 
                     contextMenu.show(signalsListView.getScene().getWindow(), mouseEvent.getScreenX(), mouseEvent.getScreenY());
                 }
