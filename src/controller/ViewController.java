@@ -190,8 +190,6 @@ public class ViewController implements Initializable {
                         addRemoveSignalChart(cell.getItem());
                     });
 
-
-
                     MenuItem editItem = new MenuItem();
                     editItem.textProperty().bind(Bindings.format("Zmień nazwę..."));
                     editItem.setOnAction(event -> {
@@ -286,7 +284,25 @@ public class ViewController implements Initializable {
                         }
                     });
 
-                    contextMenu.getItems().add(addToChartItem);
+                    MenuItem filterItem = new MenuItem();
+                    filterItem.textProperty().bind(Bindings.format("Filtruj"));
+                    filterItem.setOnAction(event -> {
+                        for (Signal signal : loadedSignals) {
+                            if (signal.getName().equals(cell.getItem())) {
+                                try {
+                                    Signal outputSignal = openFilterDialog(signal);
+                                    if (outputSignal != null) {
+                                        loadedSignals.add(outputSignal);
+                                        refreshSignalsListView();
+                                    }
+                                } catch(IOException e) {
+                                    e.printStackTrace();
+                                }
+                                break;
+                            }
+                        }
+
+                    });
 
                     if(signalsListView.getSelectionModel().getSelectedItems().size() > 1)
                     {
@@ -408,11 +424,15 @@ public class ViewController implements Initializable {
                         );
 
                         contextMenu.getItems().add(performActionOnSelectedMenu);
+                    } else {
+                        contextMenu.getItems().addAll(
+                                convertItem,
+                                filterItem);
                     }
-                    else contextMenu.getItems().add(convertItem);
 
                     contextMenu.getItems().addAll(
                             new SeparatorMenuItem(),
+                            addToChartItem,
                             exportItem,
                             editItem,
                             deleteItem);
@@ -786,6 +806,16 @@ public class ViewController implements Initializable {
         FXMLLoader loader = new FXMLLoader(getClass().getResource("../view/layout/ConversionDialog.fxml"));
         Stage stage = getDialogStage(loader, true);
         ConversionDialogController controller = loader.getController();
+        controller.initData(signal);
+        controller.setStage(stage);
+        stage.showAndWait();
+        return controller.getOutputSignal();
+    }
+
+    public Signal openFilterDialog(Signal signal) throws IOException {
+        FXMLLoader loader = new FXMLLoader(getClass().getResource("../view/layout/FilterDialog.fxml"));
+        Stage stage = getDialogStage(loader, true);
+        FilterDialogController controller = loader.getController();
         controller.initData(signal);
         controller.setStage(stage);
         stage.showAndWait();

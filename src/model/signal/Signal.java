@@ -1,5 +1,7 @@
 package model.signal;
 
+import model.signal.filter.LowPassFilter;
+
 import java.io.Serializable;
 import java.util.*;
 import java.util.function.DoubleBinaryOperator;
@@ -295,44 +297,8 @@ public class Signal implements Serializable {
     }
 
     public Signal convolute(Signal secondarySignal) {
-        return convoluteSignals(this, secondarySignal);
+        LowPassFilter lowPassFilter = new LowPassFilter(null);
+        return lowPassFilter.convoluteSignals(this, secondarySignal);
     }
 
-    public Signal convoluteSignals(Signal primarySignal, Signal secondarySignal) {
-        ArrayList<Sample> secondarySamples = secondarySignal.getSamples();
-        int samplesCount = primarySignal.getSamples().size() + secondarySamples.size() - 1;
-        ArrayList<Sample> resultSamples = new ArrayList<>(samplesCount);
-        double duration = Math.max(primarySignal.getDuration(), secondarySignal.getDuration());
-        double samplesDistance = duration / samplesCount;
-        double beginTime = Math.min(primarySignal.getSamples().get(0).time, secondarySamples.get(0).time);
-
-        for (int sampleIndex = 0; sampleIndex <= samplesCount - 1; ++sampleIndex) {
-            double convolutionValue = 0;
-            double convolutionTime = beginTime + (sampleIndex * samplesDistance);
-            double primarySampleValue, secondarySampleValue;
-            for (int k = 0; k < samplesCount; ++k) {
-                if (k < samples.size()) {
-                    primarySampleValue = samples.get(k).value;
-                } else {
-                    primarySampleValue = 0;
-                }
-                if ((sampleIndex - k < 0) || (sampleIndex - k >= secondarySamples.size())) {
-                    secondarySampleValue = 0;
-                } else {
-                    secondarySampleValue = secondarySamples.get(sampleIndex - k).value;
-                }
-                convolutionValue += primarySampleValue * secondarySampleValue;
-            }
-            Sample resultSample = new Sample(convolutionTime, convolutionValue);
-            if (Double.isFinite(resultSample.value)) resultSamples.add(resultSample);
-        }
-        Sample maxSample = resultSamples
-                .stream()
-                .max(Comparator.comparingDouble(Sample::getValue))
-                .orElse(null);
-        double amplitude = (maxSample != null) ? maxSample.getValue() : 0;
-        double frequency = samplesCount / duration;
-
-        return new Signal(resultSamples, duration, amplitude, frequency);
-    }
 }
