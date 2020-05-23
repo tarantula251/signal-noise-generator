@@ -48,7 +48,7 @@
                   <Insets bottom="5.0" top="10.0" />
                </GridPane.margin></Button>
             <Label text="Rekonstrukcja sygnału:" GridPane.rowIndex="6" />
-            <Label text="Ilość próbek (sinc):" GridPane.rowIndex="8" />
+            <Label text="Próbek na stronę (sinc):" GridPane.rowIndex="8" />
             <TextField fx:id="textFieldSamplesCount" GridPane.rowIndex="9" />
          </children>
       </GridPane>

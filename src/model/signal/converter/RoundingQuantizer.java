@@ -1,7 +1,6 @@
 package model.signal.converter;
 
 import model.signal.Sample;
-import model.signal.Signal;
 
 import java.util.ArrayList;
 
@@ -13,18 +12,15 @@ public class RoundingQuantizer extends Quantizer
     }
 
     @Override
-    public ArrayList<Sample> quantize(ArrayList<Sample> samples)
+    public ArrayList<Sample> quantize(ArrayList<Sample> samples, double amplitude)
     {
-        int msbValue = (int)Math.pow(2, getBits() - 1);
-        int leftBound = -msbValue;
-        int rightBound = msbValue -1;
+        double valueStep = 2 * amplitude / Math.pow(2, getBits());
 
         ArrayList<Sample> result = new ArrayList<>();
         for(Sample sample : samples)
         {
-            long sampleValue = Math.round(sample.value);
-            sampleValue = Math.max(sampleValue, leftBound);
-            sampleValue = Math.min(sampleValue, rightBound);
+            double sampleValue = Math.round(sample.value / valueStep) * valueStep;
+
             result.add(new Sample(sample.time, sampleValue));
         }
         return result;
