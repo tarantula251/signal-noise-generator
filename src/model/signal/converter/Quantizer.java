@@ -18,5 +18,5 @@ public abstract class Quantizer
         return bits;
     }
 
-    public abstract ArrayList<Sample> quantize(ArrayList<Sample> samples);
+    public abstract ArrayList<Sample> quantize(ArrayList<Sample> samples, double amplitude);
 }
