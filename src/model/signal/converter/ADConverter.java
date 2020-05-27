@@ -81,7 +81,7 @@ public class ADConverter implements Converter
 
         if(quantizer != null)
         {
-            samples = quantizer.quantize(samples);
+            samples = quantizer.quantize(samples, signal.getAmplitude());
             if(samples == null)
             {
                 throw new ADConverterException("Błąd kwantyzacji próbek.");

@@ -23,13 +23,24 @@ public class SincFunctionConversionStrategy implements ConversionStrategy
     private double getSampleValueForTime(Signal signal, double time, double samplesDistance)
     {
         double value = 0;
-        double step = signal.getSamples().size() / (double)samplesCount;
-        int lastIndex = -1;
-        for(double i = 0; i < signal.getSamples().size(); i+=step)
+
+        for(int i = 0; i < signal.getSamples().size(); ++i)
         {
-            int index = (int)i;
-            if(index == lastIndex) continue;
-            value += signal.getSamples().get(index).value * sinc(time / samplesDistance - i);
+            Sample sample = signal.getSamples().get(i);
+            if(Signal.doubleComparator.compare(sample.time, time) < 0 && i < signal.getSamples().size() - 1) continue;
+
+            for(int leftIndex = i - 1; leftIndex >= i - samplesCount; --leftIndex)
+            {
+                if(leftIndex < 0) break;
+                value += signal.getSamples().get(leftIndex).value * sinc(time / samplesDistance - leftIndex);
+            }
+
+            for(int rightIndex = i; rightIndex < i + samplesCount; ++rightIndex)
+            {
+                if(rightIndex > signal.getSamples().size() - 1) break;
+                value += signal.getSamples().get(rightIndex).value * sinc(time / samplesDistance - rightIndex);
+            }
+            break;
         }
         return value;
     }
