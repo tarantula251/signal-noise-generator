@@ -8,6 +8,9 @@ public abstract class Filter {
     public static String IMPULSE_RESPONSE_SIGNAL = "impulseResponseSignal";
     public static String FILTERED_SIGNAL = "filteredSignal";
 
+    public static String CORRELATION_DIRECT_METHOD = "DM";
+    public static String CORRELATION_CONVOLUTION_METHOD = "CM";
+
     public Filter(String windowType, String filterType)
     {
         this.windowType = windowType;

@@ -33,7 +33,7 @@ public class FilterGenerator extends Filter {
         double samplesDistance = duration / samplesCount;
         double beginTime = Math.min(primarySignal.getSamples().get(0).time, secondarySamples.get(0).time);
 
-        for (int sampleIndex = 0; sampleIndex <= samplesCount - 1; ++sampleIndex) {
+        for (int sampleIndex = 0; sampleIndex < samplesCount; ++sampleIndex) {
             double convolutionValue = 0;
             double convolutionTime = beginTime + (sampleIndex * samplesDistance);
             double primarySampleValue, secondarySampleValue;
@@ -114,6 +114,50 @@ public class FilterGenerator extends Filter {
             return 1.0;
         } else {
             return 2.0 * Math.sin(Math.PI * sampleIndex / 2.0);
+        }
+    }
+
+    public Signal correlateSignals(Signal primarySignal, Signal secondarySignal, String correlationType) {
+        if (Filter.CORRELATION_DIRECT_METHOD.equals(correlationType)) {
+            ArrayList<Sample> secondarySamples = secondarySignal.getSamples();
+            int samplesCount = primarySignal.getSamples().size();
+            ArrayList<Sample> resultSamples = new ArrayList<>(samplesCount);
+            double duration = Math.max(primarySignal.getDuration(), secondarySignal.getDuration());
+            double samplesDistance = duration / samplesCount;
+            double beginTime = Math.min(primarySignal.getSamples().get(0).time, secondarySamples.get(0).time);
+
+            for (int sampleIndex = 1 - secondarySamples.size(); sampleIndex < samplesCount; ++sampleIndex) {
+                double convolutionValue = 0;
+                double convolutionTime = beginTime + (sampleIndex * samplesDistance);
+                double primarySampleValue = 0, secondarySampleValue = 0;
+                for (int k = 0; k < samplesCount; ++k) {
+                    if (k - sampleIndex >= 0 && k - sampleIndex < secondarySamples.size()) {
+                        primarySampleValue = primarySignal.getSamples().get(k).value;
+                        secondarySampleValue = secondarySamples.get(k - sampleIndex).value;
+                    }
+                    convolutionValue += primarySampleValue * secondarySampleValue;
+                }
+                Sample resultSample = new Sample(convolutionTime, convolutionValue);
+                if (Double.isFinite(resultSample.value)) resultSamples.add(resultSample);
+            }
+            Sample maxSample = resultSamples
+                    .stream()
+                    .max(Comparator.comparingDouble(Sample::getValue))
+                    .orElse(null);
+            double amplitude = (maxSample != null) ? maxSample.getValue() : 0;
+            double frequency = samplesCount / duration;
+
+            return new Signal(resultSamples, duration, amplitude, frequency);
+        } else {
+            ArrayList<Sample> secondarySamples = secondarySignal.getSamples();
+            ArrayList<Sample> secondarySamplesReversed = new ArrayList<>();
+            for (int sampleIndex = 0; sampleIndex < secondarySamples.size() - 1; ++sampleIndex) {
+                secondarySamplesReversed.add(new Sample(secondarySamples.get(sampleIndex).time,
+                        secondarySamples.get(secondarySamples.size() - 1 - sampleIndex).value));
+            }
+            Signal secondarySignalReversed = new Signal(secondarySamplesReversed, secondarySignal.getDuration(), secondarySignal.getAmplitude(), secondarySignal.getFrequency());
+
+            return convoluteSignals(primarySignal, secondarySignalReversed);
         }
     }
 }

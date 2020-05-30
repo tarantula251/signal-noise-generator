@@ -3,7 +3,8 @@ package model.signal;
 import model.signal.filter.FilterGenerator;
 
 import java.io.Serializable;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.function.DoubleBinaryOperator;
 
 public class Signal implements Serializable {
@@ -299,6 +300,11 @@ public class Signal implements Serializable {
     public Signal convolute(Signal secondarySignal) {
         FilterGenerator filterGenerator = new FilterGenerator(null, null);
         return filterGenerator.convoluteSignals(this, secondarySignal);
+    }
+
+    public Signal correlate(Signal secondarySignal, String correlationType) {
+        FilterGenerator filterGenerator = new FilterGenerator(null, null);
+        return filterGenerator.correlateSignals(this, secondarySignal, correlationType);
     }
 
 }

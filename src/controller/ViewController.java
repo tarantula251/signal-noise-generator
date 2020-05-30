@@ -19,6 +19,7 @@ import javafx.stage.Stage;
 import model.signal.Sample;
 import model.signal.Signal;
 import model.signal.SignalException;
+import model.signal.filter.Filter;
 import model.signal.generator.SignalGenerator;
 import model.signal.generator.SignalGeneratorFactory;
 
@@ -415,12 +416,46 @@ public class ViewController implements Initializable {
                             refreshSignalsListView();
                         });
 
+                        MenuItem signalCorrelationDirectMenuItem = new MenuItem("Dokonaj korelacji (metoda bezpośrednia)");
+                        signalCorrelationDirectMenuItem.setOnAction(actionEvent ->
+                        {
+                            ArrayList<Signal> signals = getSelectedSignals();
+                            if(signals.isEmpty()) return;
+
+                            Signal primarySignal = signals.get(0);
+                            Signal secondarySignal = signals.get(1);
+                            primarySignal = primarySignal.correlate(secondarySignal, Filter.CORRELATION_DIRECT_METHOD);
+
+                            primarySignal.setName("Correlation product of selected " + LocalDateTime.now().toString().replace('.', '_').replace(':', '_'));
+
+                            loadedSignals.add(primarySignal);
+                            refreshSignalsListView();
+                        });
+
+                        MenuItem signalCorrelationConvolutionMenuItem = new MenuItem("Dokonaj korelacji (metoda splotu)");
+                        signalCorrelationConvolutionMenuItem.setOnAction(actionEvent ->
+                        {
+                            ArrayList<Signal> signals = getSelectedSignals();
+                            if(signals.isEmpty()) return;
+
+                            Signal primarySignal = signals.get(0);
+                            Signal secondarySignal = signals.get(1);
+                            primarySignal = primarySignal.correlate(secondarySignal, Filter.CORRELATION_CONVOLUTION_METHOD);
+
+                            primarySignal.setName("Correlation product of selected " + LocalDateTime.now().toString().replace('.', '_').replace(':', '_'));
+
+                            loadedSignals.add(primarySignal);
+                            refreshSignalsListView();
+                        });
+
                         performActionOnSelectedMenu.getItems().addAll(
                                 sumSelectedMenuItem,
                                 subtractSelectedMenuItem,
                                 multiplySelectedMenuItem,
                                 divideSelectedMenuItem,
-                                signalConvolutionMenuItem
+                                signalConvolutionMenuItem,
+                                signalCorrelationDirectMenuItem,
+                                signalCorrelationConvolutionMenuItem
                         );
 
                         contextMenu.getItems().add(performActionOnSelectedMenu);
