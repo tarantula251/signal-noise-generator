@@ -17,10 +17,9 @@ import javafx.stage.Stage;
 import model.signal.Sample;
 import model.signal.Signal;
 import model.signal.filter.Filter;
-import model.signal.filter.LowPassFilter;
+import model.signal.filter.FilterGenerator;
 
 import java.net.URL;
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Optional;
 import java.util.ResourceBundle;
@@ -31,7 +30,6 @@ public class FilterDialogController implements Initializable {
     @FXML private Button buttonSave;
     @FXML private TextField f0Input;
     @FXML private TextField mCountInput;
-    @FXML private TextField nCountInput;
     @FXML private ComboBox filterTypeComboBox;
     @FXML private ComboBox windowTypeComboBox;
     @FXML private LineChart<Number, Number> filterLineChart;
@@ -43,11 +41,11 @@ public class FilterDialogController implements Initializable {
     private Signal responseOutputSignal = null;
     private Stage stage;
 
-    public final String WINDOW_TYPE_O1_VALUE = "(O1) Okno prostokątne";
-    public final String WINDOW_TYPE_O2_VALUE = "(O2) Okno Blackmana";
+    public static final String WINDOW_TYPE_O1_VALUE = "(O1) Okno prostokątne";
+    public static final String WINDOW_TYPE_O2_VALUE = "(O2) Okno Blackmana";
 
-    public final String FILTER_TYPE_F1_VALUE = "(F1) Fitr dolnoprzepustowy";
-    public final String FILTER_TYPE_F2_VALUE = "(F2) Fitr środkowoprzepustowy";
+    public static final String FILTER_TYPE_F1_VALUE = "(F1) Fitr dolnoprzepustowy";
+    public static final String FILTER_TYPE_F2_VALUE = "(F2) Fitr środkowoprzepustowy";
 
     private void drawFilteredSignalCurve(Signal signal) {
         if(signal == null) return;
@@ -143,13 +141,13 @@ public class FilterDialogController implements Initializable {
         filterBtn.setOnAction(actionEvent -> {
             double f0Frequency = Double.parseDouble(f0Input.getText());
             int mCount = Integer.parseInt(mCountInput.getText());
-            int nCount = Integer.parseInt(nCountInput.getText());
             Filter filter = null;
-            if (filterTypeComboBox.getSelectionModel().getSelectedItem() == FILTER_TYPE_F1_VALUE) {
-                filter = new LowPassFilter((String) windowTypeComboBox.getSelectionModel().getSelectedItem());
+            if (!filterTypeComboBox.getSelectionModel().isEmpty() &&
+                    !windowTypeComboBox.getSelectionModel().isEmpty()) {
+                filter = new FilterGenerator((String) windowTypeComboBox.getSelectionModel().getSelectedItem(), (String) filterTypeComboBox.getSelectionModel().getSelectedItem());
             }
 
-            HashMap<String, Signal> signalsMap = filter.filter(signal, f0Frequency, mCount, nCount);
+            HashMap<String, Signal> signalsMap = filter.filter(signal, f0Frequency, mCount);
             filteredOutputSignal = signalsMap.get(Filter.FILTERED_SIGNAL);
             responseOutputSignal = signalsMap.get(Filter.IMPULSE_RESPONSE_SIGNAL);
 
@@ -179,19 +177,14 @@ public class FilterDialogController implements Initializable {
     }
 
     private void setTextFieldsValidation() {
-        ArrayList<TextField> textFieldList = new ArrayList<>();
-        textFieldList.add(mCountInput);
-        textFieldList.add(nCountInput);
-        for (TextField field : textFieldList) {
-            field.textProperty().addListener(new ChangeListener<String>() {
-                @Override
-                public void changed(ObservableValue<? extends String> observableValue, String oldValue, String newValue) {
-                    if (!newValue.matches("\\d+")) {
-                        field.setText(oldValue);
-                    }
+        mCountInput.textProperty().addListener(new ChangeListener<String>() {
+            @Override
+            public void changed(ObservableValue<? extends String> observableValue, String oldValue, String newValue) {
+                if (!newValue.matches("^\\d*[13579]$")) {
+                    mCountInput.setText(oldValue);
                 }
-            });
-        }
+            }
+        });
         f0Input.textProperty().addListener(new ChangeListener<String>() {
             @Override
             public void changed(ObservableValue<? extends String> observableValue, String oldValue, String newValue) {
@@ -206,14 +199,12 @@ public class FilterDialogController implements Initializable {
         BooleanBinding binding = new BooleanBinding() {
             {
                 super.bind(f0Input.textProperty(),
-                        mCountInput.textProperty(),
-                        nCountInput.textProperty());
+                        mCountInput.textProperty());
             }
             @Override
             protected boolean computeValue() {
                 return (f0Input.getText().isEmpty()
-                        || mCountInput.getText().isEmpty()
-                        || nCountInput.getText().isEmpty());
+                        || mCountInput.getText().isEmpty());
             }
         };
         filterBtn.disableProperty().bind(binding);

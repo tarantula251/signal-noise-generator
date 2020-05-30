@@ -48,8 +48,6 @@
                     <GridPane.margin>
                         <Insets bottom="5.0" top="10.0" />
                     </GridPane.margin></Button>
-                <Label text="Liczba próbek:" GridPane.rowIndex="8" />
-                <TextField fx:id="nCountInput" GridPane.rowIndex="9" />
             </children>
         </GridPane>
         <GridPane hgap="5.0" prefHeight="245.0" prefWidth="465.0" vgap="5.0" GridPane.columnIndex="1">

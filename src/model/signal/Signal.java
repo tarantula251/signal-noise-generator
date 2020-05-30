@@ -1,6 +1,6 @@
 package model.signal;
 
-import model.signal.filter.LowPassFilter;
+import model.signal.filter.FilterGenerator;
 
 import java.io.Serializable;
 import java.util.*;
@@ -297,8 +297,8 @@ public class Signal implements Serializable {
     }
 
     public Signal convolute(Signal secondarySignal) {
-        LowPassFilter lowPassFilter = new LowPassFilter(null);
-        return lowPassFilter.convoluteSignals(this, secondarySignal);
+        FilterGenerator filterGenerator = new FilterGenerator(null, null);
+        return filterGenerator.convoluteSignals(this, secondarySignal);
     }
 
 }
