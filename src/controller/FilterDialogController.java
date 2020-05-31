@@ -180,7 +180,7 @@ public class FilterDialogController implements Initializable {
         mCountInput.textProperty().addListener(new ChangeListener<String>() {
             @Override
             public void changed(ObservableValue<? extends String> observableValue, String oldValue, String newValue) {
-                if (!newValue.matches("^\\d*[13579]$")) {
+                if (!newValue.matches("\\d+")) {
                     mCountInput.setText(oldValue);
                 }
             }
