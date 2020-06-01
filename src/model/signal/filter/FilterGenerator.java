@@ -10,6 +10,10 @@ import java.util.HashMap;
 
 public class FilterGenerator extends Filter {
 
+    public FilterGenerator(){
+        super();
+    }
+
     public FilterGenerator(String windowType, String filterType) {
         super(windowType, filterType);
     }

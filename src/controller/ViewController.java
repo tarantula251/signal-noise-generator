@@ -53,6 +53,7 @@ public class ViewController implements Initializable {
     @FXML private Label varianceLabel;
     @FXML private MenuBar menuBar;
     @FXML private MenuItem importMenuItem;
+    @FXML private MenuItem radarMenuItem;
     @FXML private ListView<String> signalsListView;
     private ArrayList<Signal> loadedSignals = new ArrayList<>();
 
@@ -166,6 +167,17 @@ public class ViewController implements Initializable {
 
         generateButton.setOnAction(generateButtonActionEventEventHandler);
         importMenuItem.setOnAction(importMenuItemActionEventEventHandler);
+
+        EventHandler<ActionEvent> radarMenuItemActionEventEventHandler = actionEvent -> {
+            try {
+                openRadarDialog();
+            } catch (IOException e) {
+                e.printStackTrace();
+                System.err.println(e.getMessage());
+            }
+        };
+
+        radarMenuItem.setOnAction(radarMenuItemActionEventEventHandler);
 
         signalsListView.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
         signalsListView.setCellFactory(lv -> {
@@ -855,6 +867,14 @@ public class ViewController implements Initializable {
         controller.setStage(stage);
         stage.showAndWait();
         return controller.getOutputSignal();
+    }
+
+    public void openRadarDialog() throws IOException {
+        FXMLLoader loader = new FXMLLoader(getClass().getResource("../view/layout/RadarDialog.fxml"));
+        Stage stage = getDialogStage(loader, true);
+        RadarDialogController controller = loader.getController();
+        controller.setStage(stage);
+        stage.showAndWait();
     }
 
     private Stage getDialogStage(FXMLLoader loader, boolean resizable) throws IOException

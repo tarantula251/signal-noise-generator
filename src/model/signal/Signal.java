@@ -298,12 +298,12 @@ public class Signal implements Serializable {
     }
 
     public Signal convolute(Signal secondarySignal) {
-        FilterGenerator filterGenerator = new FilterGenerator(null, null);
+        FilterGenerator filterGenerator = new FilterGenerator();
         return filterGenerator.convoluteSignals(this, secondarySignal);
     }
 
     public Signal correlate(Signal secondarySignal, String correlationType) {
-        FilterGenerator filterGenerator = new FilterGenerator(null, null);
+        FilterGenerator filterGenerator = new FilterGenerator();
         return filterGenerator.correlateSignals(this, secondarySignal, correlationType);
     }
 

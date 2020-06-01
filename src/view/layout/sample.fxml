@@ -20,6 +20,7 @@
           <Menu mnemonicParsing="false" text="Plik">
             <items>
                   <MenuItem fx:id="importMenuItem" mnemonicParsing="false" text="Importuj..." />
+                  <MenuItem fx:id="radarMenuItem" mnemonicParsing="false" text="Otwórz radar" />
                   <SeparatorMenuItem mnemonicParsing="false" />
               <MenuItem fx:id="closeAppMenuItem" mnemonicParsing="false" onAction="#closeApp" text="Zamknij" />
             </items>

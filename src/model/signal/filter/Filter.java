@@ -11,6 +11,8 @@ public abstract class Filter {
     public static String CORRELATION_DIRECT_METHOD = "DM";
     public static String CORRELATION_CONVOLUTION_METHOD = "CM";
 
+    public Filter() {}
+
     public Filter(String windowType, String filterType)
     {
         this.windowType = windowType;
