@@ -4,8 +4,8 @@ public class TrackedObject {
     public double position;
     public double velocity;
 
-    public TrackedObject() {
+    public TrackedObject(double velocity) {
         this.position = 0.0;
-        this.velocity = 1.0;
+        this.velocity = velocity;
     }
 }

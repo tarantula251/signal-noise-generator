@@ -44,7 +44,7 @@ public class ConversionDialogController implements Initializable
     private Stage stage;
 
     public final String QUANTIZER_TYPE_Q0_VALUE = "(Q0) Bez kwantyzacji";
-    public final String QUANTIZER_TYPE_Q1_VALUE = "(Q1) Kwantyzacja równomierna z obcięciem";
+    public final String QUANTIZER_TYPE_Q1_VALUE = "(Q1) Kwantyzacja równomierna z odcięciem";
     public final String QUANTIZER_TYPE_Q2_VALUE = "(Q2) Kwantyzacja równomierna z zaokrąglaniem";
 
     public final String CONVERSION_TYPE_R0_VALUE = "(R0) Brak";

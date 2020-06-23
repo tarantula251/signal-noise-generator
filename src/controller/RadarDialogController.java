@@ -23,7 +23,6 @@ import java.util.ResourceBundle;
 
 public class RadarDialogController implements Initializable {
     @FXML private Button radarBtn;
-    @FXML private TextField timeUnitInput;
     @FXML private TextField realVelocityInput;
     @FXML private TextField propagationVelocityInput;
     @FXML private TextField signalPeriodInput;
@@ -124,7 +123,6 @@ public class RadarDialogController implements Initializable {
         enableDisableFilterBtn();
 
         radarBtn.setOnAction(actionEvent -> {
-            double timeUnit = Double.parseDouble(timeUnitInput.getText());
             double realVelocity = Double.parseDouble(realVelocityInput.getText());
             double propagationVelocity = Double.parseDouble(propagationVelocityInput.getText());
             double signalPeriod = Double.parseDouble(signalPeriodInput.getText());
@@ -132,7 +130,7 @@ public class RadarDialogController implements Initializable {
             double reportPeriod = Double.parseDouble(reportPeriodInput.getText());
             int bufferSize = Integer.parseInt(bufferSizeInput.getText());
 
-            RadarGenerator radarGenerator = new RadarGenerator(timeUnit, realVelocity, propagationVelocity, signalPeriod,
+            RadarGenerator radarGenerator = new RadarGenerator(realVelocity, propagationVelocity, signalPeriod,
                     samplingFrequency, reportPeriod, bufferSize);
 
             try {
@@ -177,7 +175,6 @@ public class RadarDialogController implements Initializable {
             });
         }
         ArrayList<TextField> decimalTextFieldList = new ArrayList<>();
-        decimalTextFieldList.add(timeUnitInput);
         decimalTextFieldList.add(realVelocityInput);
         decimalTextFieldList.add(propagationVelocityInput);
         decimalTextFieldList.add(signalPeriodInput);
@@ -198,8 +195,7 @@ public class RadarDialogController implements Initializable {
     private void enableDisableFilterBtn() {
         BooleanBinding binding = new BooleanBinding() {
             {
-                super.bind(timeUnitInput.textProperty(),
-                        realVelocityInput.textProperty(),
+                super.bind(realVelocityInput.textProperty(),
                         propagationVelocityInput.textProperty(),
                         signalPeriodInput.textProperty(),
                         probeFrequencyInput.textProperty(),
@@ -208,8 +204,7 @@ public class RadarDialogController implements Initializable {
             }
             @Override
             protected boolean computeValue() {
-                return (timeUnitInput.getText().isEmpty()
-                        || realVelocityInput.getText().isEmpty()
+                return (realVelocityInput.getText().isEmpty()
                         || propagationVelocityInput.getText().isEmpty()
                         || signalPeriodInput.getText().isEmpty()
                         || probeFrequencyInput.getText().isEmpty()

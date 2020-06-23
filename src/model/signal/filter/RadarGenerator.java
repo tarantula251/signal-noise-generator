@@ -15,7 +15,6 @@ public class RadarGenerator {
     public final static String ORIGINAL_DISTANCE = "originalDistance";
     public final static String CALCULATED_DISTANCE = "calculatedDistance";
 
-    private double timeUnit; //TODO remove
     private double realVelocity;
     private double propagationVelocity;
     private double signalPeriod;
@@ -23,6 +22,7 @@ public class RadarGenerator {
     private double reportPeriod;
     private int bufferSize;
     private double duration;
+    private double amplitude;
     private TrackedObject trackedObject;
     private ArrayList<Double> calculatedDistancesList = new ArrayList<>();
     private ArrayList<Double> originalDistancesList = new ArrayList<>();
@@ -30,24 +30,28 @@ public class RadarGenerator {
     private Signal sentSignal;
     private Signal receivedSignal;
     private Signal correlatedSignal;
+    private FilterGenerator filterGenerator;
 
-    public RadarGenerator(double timeUnit, double realVelocity, double propagationVelocity, double signalPeriod,
+    public RadarGenerator(double realVelocity, double propagationVelocity, double signalPeriod,
                           double samplingFrequency, double reportPeriod, int bufferSize) {
-        this.timeUnit = timeUnit;
         this.realVelocity = realVelocity;
         this.propagationVelocity = propagationVelocity;
         this.signalPeriod = signalPeriod;
         this.samplingFrequency = samplingFrequency;
         this.reportPeriod = reportPeriod;
         this.bufferSize = bufferSize;
-        this.trackedObject = new TrackedObject();
     }
 
     public void startRadarSimulation() throws InterruptedException {
-        this.trackedObject = new TrackedObject();
+        this.trackedObject = new TrackedObject(this.realVelocity);
         this.duration = this.bufferSize / this.samplingFrequency;
+        this.amplitude = Math.random() * (5 - 2);
 
-        this.sentSignal = generateSignal(this.signalPeriod, this.duration, this.samplingFrequency, -1);
+        this.sentSignal = generateSignal(this.signalPeriod, this.duration, this.samplingFrequency, 0);
+        this.receivedSignal = generateSignal(this.signalPeriod, this.duration, this.samplingFrequency, 0);
+
+        filterGenerator = new FilterGenerator();
+        this.correlatedSignal = this.filterGenerator.correlateSignals(this.sentSignal, this.receivedSignal, Filter.CORRELATION_CONVOLUTION_METHOD);
 
         simulationThread = new Thread(() -> {
             try {
@@ -61,19 +65,22 @@ public class RadarGenerator {
     }
 
     private void startSimulation() throws InterruptedException {
-        FilterGenerator filterGenerator = new FilterGenerator();
         Thread.sleep((int) this.reportPeriod * 1000);
         trackedObject.position += trackedObject.velocity * this.reportPeriod;
         double delayTime = 2.0 * trackedObject.position / this.propagationVelocity;
 
-        this.receivedSignal = generateSignal(this.signalPeriod, this.duration, this.samplingFrequency, delayTime);
-        this.correlatedSignal = filterGenerator.correlateSignals(this.sentSignal, this.receivedSignal, Filter.CORRELATION_CONVOLUTION_METHOD);
+        Signal currentReceivedSignal = generateSignal(this.signalPeriod, this.duration, this.samplingFrequency, delayTime);
+        Signal currentCorrelatedSignal = filterGenerator.correlateSignals(this.sentSignal, currentReceivedSignal, Filter.CORRELATION_CONVOLUTION_METHOD);
 
-        double calculatedDistance = calculateDistance(correlatedSignal);
+        double calculatedDistance = calculateDistance(currentCorrelatedSignal);
         this.calculatedDistancesList.add(calculatedDistance);
 
-        this.trackedObject.position = this.realVelocity * this.bufferSize / (2.0 * this.samplingFrequency); //TODO fix
-        originalDistancesList.add(this.trackedObject.position);
+//        this.trackedObject.position = Math.round((calculatedDistance * this.propagationVelocity * 1000 / (this.samplingFrequency * 2.0)) * 100000.0) / 100000.0;
+        this.trackedObject.position = Math.round((calculatedDistance * this.propagationVelocity * 1000 / (this.samplingFrequency)) * 100000.0) / 100000.0;
+        this.originalDistancesList.add(this.trackedObject.position);
+
+        this.receivedSignal = currentReceivedSignal;
+        this.correlatedSignal = currentCorrelatedSignal;
     }
 
     private double calculateDistance(Signal correlatedSignal) {
@@ -83,9 +90,13 @@ public class RadarGenerator {
                 .stream()
                 .max(Comparator.comparing(Sample::getValue))
                 .orElse(null);
-        double maxSampleValue = maxSample.getValue();
-        double delayTime = maxSampleValue / this.samplingFrequency;
-        return Math.round(delayTime * this.propagationVelocity / 2.0);
+//        double maxSampleValue = maxSample.getValue();
+//        double delayTime = maxSampleValue / this.samplingFrequency; //???
+//        System.out.println("delayTime "+delayTime);
+
+        double timeDiff = maxSample.getTime() - rightHalfSamples.get(0).getTime();
+
+        return Math.round((timeDiff * this.propagationVelocity * 1000 / 2.0) * 100000.0) / 100000.0;
     }
 
     public HashMap<String, ArrayList<Double>> getDistancesMap() {
@@ -105,20 +116,17 @@ public class RadarGenerator {
         return signalsMap;
     }
 
-    private Signal generateSignal(double period, double duration, double frequency, double delayTime) {
+    private Signal generateSignal(double period, double duration, double frequency, double delay) {
         ArrayList<Sample> samples = new ArrayList<>();
         int samplesCount = this.bufferSize;
         double samplesDistance = duration / samplesCount;
-        double amplitude = Math.random() * 2;
+
         for (int i = 0; i < samplesCount; ++i) {
-            double value = amplitude * Math.sin(2 * Math.PI * (i * samplesDistance) / period) +
-                amplitude * Math.sin(2 * Math.PI * (i * samplesDistance) / (period + 1));
-            if (delayTime != -1) {
-                samples.add(new Sample(i * samplesDistance + delayTime, value));
-            } else {
-                samples.add(new Sample(i * samplesDistance, value));
-            }
+            double partSinArg = 2 * Math.PI * (i * samplesDistance - delay);
+            double value = this.amplitude * Math.sin(partSinArg / period) +
+                    this.amplitude * Math.sin(partSinArg / (period * 2));
+            samples.add(new Sample(i * samplesDistance, value));
         }
-        return new Signal(samples, duration, amplitude, frequency);
+        return new Signal(samples, duration, this.amplitude, frequency);
     }
 }

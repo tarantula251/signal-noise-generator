@@ -23,4 +23,8 @@ public class Sample implements Serializable {
     public double getValue() {
         return this.value;
     }
+
+    public double getTime() {
+        return this.time;
+    }
 }
