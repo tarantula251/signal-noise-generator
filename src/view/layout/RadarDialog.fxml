@@ -23,7 +23,6 @@
                 <RowConstraints fillHeight="false" maxHeight="1.7976931348623157E308" />
                 <RowConstraints fillHeight="false" maxHeight="1.7976931348623157E308" />
                 <RowConstraints fillHeight="false" maxHeight="1.7976931348623157E308" />
-                <RowConstraints fillHeight="false" maxHeight="1.7976931348623157E308" />
                 <RowConstraints fillHeight="false" maxHeight="204.0" />
                 <RowConstraints fillHeight="false" maxHeight="204.0" />
                 <RowConstraints fillHeight="false" maxHeight="204.0" />
@@ -37,34 +36,41 @@
                 <RowConstraints fillHeight="false" maxHeight="204.0" />
                 <RowConstraints fillHeight="false" maxHeight="204.0" />
                 <RowConstraints fillHeight="false" maxHeight="204.0" />
+            <RowConstraints fillHeight="false" maxHeight="204.0" />
+            <RowConstraints fillHeight="false" maxHeight="204.0" />
             <RowConstraints />
             <RowConstraints />
             </rowConstraints>
             <children>
-                <Label text="Prędkość rzeczywista:" GridPane.rowIndex="1" />
-                <TextField fx:id="realVelocityInput" promptText="[m/s]" GridPane.rowIndex="2" />
-                <Label text="Prędkość rozchodzenia się sygnału:" GridPane.rowIndex="3" />
-                <TextField fx:id="propagationVelocityInput" promptText="[m/s]" GridPane.rowIndex="4" />
-                <Label text="Okres sygnału sondującego:" GridPane.rowIndex="5" />
-                <TextField fx:id="signalPeriodInput" promptText="[s]" GridPane.rowIndex="6" />
-                <Label text="Częstotliwość próbkowania:" GridPane.rowIndex="7" />
-                <TextField fx:id="probeFrequencyInput" promptText="[Hz]" GridPane.rowIndex="8" />
-                <Label text="Długość buforów:" GridPane.rowIndex="9" />
-                <TextField fx:id="bufferSizeInput" GridPane.rowIndex="10" />
-                <Label text="Okres raportowania:" GridPane.rowIndex="11" />
-                <TextField fx:id="reportPeriodInput" promptText="[s]" GridPane.rowIndex="12" />
-                <Button fx:id="radarBtn" mnemonicParsing="false" prefWidth="120.0" text="Uruchom radar" GridPane.halignment="CENTER" GridPane.rowIndex="13" GridPane.valignment="CENTER">
+                <Label text="Prędkość rzeczywista:" />
+                <TextField fx:id="realVelocityInput" promptText="[m/s]" GridPane.rowIndex="1" />
+                <Label text="Prędkość rozchodzenia się sygnału:" GridPane.rowIndex="2" />
+                <TextField fx:id="propagationVelocityInput" promptText="[m/s]" GridPane.rowIndex="3" />
+                <Label text="Okres sygnału sondującego:" GridPane.rowIndex="4" />
+                <TextField fx:id="signalPeriodInput" promptText="[s]" GridPane.rowIndex="5" />
+                <Label text="Częstotliwość próbkowania:" GridPane.rowIndex="6" />
+                <TextField fx:id="probeFrequencyInput" promptText="[Hz]" GridPane.rowIndex="7" />
+                <Label text="Długość buforów:" GridPane.rowIndex="8" />
+                <TextField fx:id="bufferSizeInput" GridPane.rowIndex="9" />
+                <Label text="Okres raportowania:" GridPane.rowIndex="10" />
+                <TextField fx:id="reportPeriodInput" promptText="[s]" GridPane.rowIndex="11" />
+                <Button fx:id="radarBtn" mnemonicParsing="false" prefWidth="120.0" text="Uruchom radar" GridPane.halignment="CENTER" GridPane.rowIndex="12" GridPane.valignment="CENTER">
                     <GridPane.margin>
                         <Insets bottom="5.0" top="10.0" />
                     </GridPane.margin>
                 </Button>
-                <Label text="Oryginalny dystans [mm]:" GridPane.rowIndex="14" />
-                <Label fx:id="originalDistanceLabel" GridPane.rowIndex="15">
+                <Label text="Oryginalny dystans [m]:" GridPane.rowIndex="13" />
+                <Label fx:id="originalDistanceLabel" GridPane.rowIndex="14">
                <padding>
                   <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
                </padding></Label>
-                <Label text="Obliczony dystans [mm]:" GridPane.rowIndex="16" />
-                <Label fx:id="calculatedDistanceLabel" GridPane.rowIndex="17">
+                <Label text="Obliczony dystans [m]:" GridPane.rowIndex="15" />
+                <Label fx:id="calculatedDistanceLabel" GridPane.rowIndex="16">
+               <padding>
+                  <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
+               </padding></Label>
+            <Label text="Następny raport za [s]:" GridPane.rowIndex="17" />
+            <Label fx:id="timerLabel" GridPane.rowIndex="18">
                <padding>
                   <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
                </padding></Label>

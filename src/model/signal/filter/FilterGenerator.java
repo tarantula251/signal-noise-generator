@@ -32,6 +32,7 @@ public class FilterGenerator extends Filter {
     public Signal convoluteSignals(Signal primarySignal, Signal secondarySignal) {
         ArrayList<Sample> primarySamples = primarySignal.getSamples();
         ArrayList<Sample> secondarySamples = secondarySignal.getSamples();
+        int convolutionComponentsMaxCount = Math.min(primarySamples.size(), secondarySamples.size());
         int samplesCount = primarySignal.getSamples().size() + secondarySamples.size() - 1;
         ArrayList<Sample> resultSamples = new ArrayList<>(samplesCount);
         double duration = Math.max(primarySignal.getDuration(), secondarySignal.getDuration());
@@ -41,10 +42,14 @@ public class FilterGenerator extends Filter {
         for (int sampleIndex = 0; sampleIndex < samplesCount; ++sampleIndex) {
             double convolutionValue = 0;
             double convolutionTime = beginTime + (sampleIndex * samplesDistance);
-            for (int k = 0; k < primarySamples.size(); ++k) {
-                if (sampleIndex - k >= 0 && sampleIndex - k < secondarySamples.size()) {
-                    convolutionValue += primarySignal.getSamples().get(k).value * secondarySamples.get(sampleIndex - k).value;
-                }
+            for (int k = 0; k < convolutionComponentsMaxCount; ++k) {
+                int secondaryIndex = secondarySamples.size() - 1 - sampleIndex + k;
+                if(secondaryIndex >= secondarySamples.size() || secondaryIndex < 0) continue;
+
+                double primaryValue = primarySamples.get(k).getValue();
+                double secondaryValue = secondarySamples.get(secondaryIndex).getValue();
+
+                convolutionValue += primaryValue * secondaryValue;
             }
             Sample resultSample = new Sample(convolutionTime, convolutionValue);
             if (Double.isFinite(resultSample.value)) resultSamples.add(resultSample);
@@ -153,13 +158,7 @@ public class FilterGenerator extends Filter {
             double frequency = samplesCount / duration;
             return new Signal(resultSamples, duration, amplitude, frequency);
         } else {
-            ArrayList<Sample> secondarySamplesReversed = new ArrayList<>();
-            for (int sampleIndex = 0; sampleIndex < secondarySamples.size() - 1; ++sampleIndex) {
-                secondarySamplesReversed.add(new Sample(secondarySamples.get(sampleIndex).time,
-                        secondarySamples.get(secondarySamples.size() - 1 - sampleIndex).value));
-            }
-            Signal secondarySignalReversed = new Signal(secondarySamplesReversed, secondarySignal.getDuration(), secondarySignal.getAmplitude(), secondarySignal.getFrequency());
-            return convoluteSignals(primarySignal, secondarySignalReversed);
+            return convoluteSignals(primarySignal, secondarySignal);
         }
     }
 }

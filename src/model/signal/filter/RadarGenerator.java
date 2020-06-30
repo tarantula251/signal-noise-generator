@@ -26,7 +26,6 @@ public class RadarGenerator {
     private TrackedObject trackedObject;
     private ArrayList<Double> calculatedDistancesList = new ArrayList<>();
     private ArrayList<Double> originalDistancesList = new ArrayList<>();
-    private Thread simulationThread;
     private Signal sentSignal;
     private Signal receivedSignal;
     private Signal correlatedSignal;
@@ -40,43 +39,22 @@ public class RadarGenerator {
         this.samplingFrequency = samplingFrequency;
         this.reportPeriod = reportPeriod;
         this.bufferSize = bufferSize;
-    }
-
-    public void startRadarSimulation() throws InterruptedException {
         this.trackedObject = new TrackedObject(this.realVelocity);
         this.duration = this.bufferSize / this.samplingFrequency;
         this.amplitude = Math.random() * (5 - 2);
-
         this.sentSignal = generateSignal(this.signalPeriod, this.duration, this.samplingFrequency, 0);
-        this.receivedSignal = generateSignal(this.signalPeriod, this.duration, this.samplingFrequency, 0);
-
         filterGenerator = new FilterGenerator();
-        this.correlatedSignal = this.filterGenerator.correlateSignals(this.sentSignal, this.receivedSignal, Filter.CORRELATION_CONVOLUTION_METHOD);
-
-        simulationThread = new Thread(() -> {
-            try {
-                startSimulation();
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            }
-        });
-        simulationThread.start();
-        simulationThread.join();
     }
 
-    private void startSimulation() throws InterruptedException {
-        Thread.sleep((int) this.reportPeriod * 1000);
-        trackedObject.position += trackedObject.velocity * this.reportPeriod;
+    public void simulate(int secondsCount) {
+
+        this.trackedObject.position = trackedObject.velocity * secondsCount;
         double delayTime = 2.0 * trackedObject.position / this.propagationVelocity;
-
         Signal currentReceivedSignal = generateSignal(this.signalPeriod, this.duration, this.samplingFrequency, delayTime);
-        Signal currentCorrelatedSignal = filterGenerator.correlateSignals(this.sentSignal, currentReceivedSignal, Filter.CORRELATION_CONVOLUTION_METHOD);
-
+        Signal currentCorrelatedSignal = filterGenerator.correlateSignals(currentReceivedSignal, this.sentSignal, Filter.CORRELATION_CONVOLUTION_METHOD);
         double calculatedDistance = calculateDistance(currentCorrelatedSignal);
-        this.calculatedDistancesList.add(calculatedDistance);
 
-//        this.trackedObject.position = Math.round((calculatedDistance * this.propagationVelocity * 1000 / (this.samplingFrequency * 2.0)) * 100000.0) / 100000.0;
-        this.trackedObject.position = Math.round((calculatedDistance * this.propagationVelocity * 1000 / (this.samplingFrequency)) * 100000.0) / 100000.0;
+        this.calculatedDistancesList.add(calculatedDistance);
         this.originalDistancesList.add(this.trackedObject.position);
 
         this.receivedSignal = currentReceivedSignal;
@@ -90,13 +68,10 @@ public class RadarGenerator {
                 .stream()
                 .max(Comparator.comparing(Sample::getValue))
                 .orElse(null);
-//        double maxSampleValue = maxSample.getValue();
-//        double delayTime = maxSampleValue / this.samplingFrequency; //???
-//        System.out.println("delayTime "+delayTime);
 
         double timeDiff = maxSample.getTime() - rightHalfSamples.get(0).getTime();
 
-        return Math.round((timeDiff * this.propagationVelocity * 1000 / 2.0) * 100000.0) / 100000.0;
+        return timeDiff * propagationVelocity;
     }
 
     public HashMap<String, ArrayList<Double>> getDistancesMap() {
@@ -129,4 +104,10 @@ public class RadarGenerator {
         }
         return new Signal(samples, duration, this.amplitude, frequency);
     }
+
+    public double getReportPeriod()
+    {
+        return reportPeriod;
+    }
 }
+
